@@ -235,17 +235,10 @@ def _assets(state, handler, path):
         name = "tux-review.js" if path.endswith(".js") else "tux-review.css"
         f = client_dir / name
         if not f.exists():
-            handler.send_response(404)
-            handler.send_header("Content-Type", "text/plain")
-            handler.end_headers()
-            handler.end_headers()
-            return
+            return _send_bytes(handler, 404, b"not found", "text/plain")
         ctype = "text/javascript; charset=utf-8" if name.endswith(".js") else "text/css; charset=utf-8"
         return _send_bytes(handler, 200, f.read_bytes(), ctype)
-    handler.send_response(404)
-    handler.send_header("Content-Type", "text/plain")
-    handler.end_headers()
-    handler.wfile.write(b"not found")
+    return _send_bytes(handler, 404, b"not found", "text/plain")
 
 
 def _static(state, handler, path):
@@ -256,11 +249,7 @@ def _static(state, handler, path):
     base = Path(state.root)
     file = (base / rel).resolve()
     if not str(file).startswith(str(base)):
-        handler.send_response(403)
-        handler.send_header("Content-Type", "text/plain")
-        handler.end_headers()
-        handler.wfile.write(b"forbidden")
-        return
+        return _send_bytes(handler, 403, b"forbidden", "text/plain")
     if not file.exists() or file.is_dir():
         for candidate in [file / "index.html", Path(str(file) + ".html")]:
             if candidate.exists() and candidate.is_file():
@@ -270,11 +259,7 @@ def _static(state, handler, path):
             if not Path(path).suffix:
                 file = base / "index.html"  # SPA fallback
             if not file.exists():
-                handler.send_response(404)
-                handler.send_header("Content-Type", "text/plain")
-                handler.end_headers()
-                handler.wfile.write(b"not found")
-                return
+                return _send_bytes(handler, 404, b"not found", "text/plain")
     ctype = _MIME.get(file.suffix, "application/octet-stream")
     body = file.read_bytes()
     if ctype.startswith("text/html"):

@@ -102,6 +102,22 @@ cd js && npm run e2e       # Playwright: activation matrix, CRUD, SPA, persisten
 .venv/Scripts/python.exe -m pytest py/tests -q   # Python mirror (via repo .venv)
 ```
 
+Packaging and release — artifacts are built, content-inspected and verified
+in dedicated environments (fresh `npm install` of the tarball, fresh venv
+with the wheel, real react/vue/angular production builds served over HTTP):
+
+```bash
+node tools/package-js.mjs            # npm tarball → dist/ + inspection
+node tools/package-py.mjs            # sdist + wheel → dist/ + inspection
+node tools/install-test.mjs          # dedicated-env installation verification
+node tools/release.mjs <x.y.z>       # bump + tests + packaging + install-test + tag/push
+```
+
+CI runs the same gates on every push/PR (ubuntu + windows): JS tests,
+Python tests, packaging inspection, dedicated-environment install test
+and the Playwright suite. Tagged releases (`v*`) publish to npm and PyPI
+via GitHub Actions (`.github/workflows/`).
+
 See `AGENTS.md` for the duality contract and the rules agents must follow.
 
 ## License

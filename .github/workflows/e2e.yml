@@ -1,0 +1,40 @@
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions: {}
+
+jobs:
+  playwright:
+    name: Playwright E2E (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: js/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+        working-directory: js
+      - name: Install Chromium
+        run: npx playwright install chromium --with-deps
+        working-directory: js
+      - name: Run E2E suite
+        run: npm run e2e
+        working-directory: js
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.os }}
+          path: js/playwright-report/
+          retention-days: 7

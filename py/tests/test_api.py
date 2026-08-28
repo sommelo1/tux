@@ -72,6 +72,19 @@ def test_static_injection_and_bootstrap(server):
         assert b"TUX Review Client" in r.read()
 
 
+def test_static_unknown_route_returns_clean_404(server):
+    base, _ = server
+    try:
+        urllib.request.urlopen(base + "/definitely-missing.png")
+        raise AssertionError("expected HTTP 404")
+    except urllib.error.HTTPError as e:
+        assert e.code == 404
+        body = e.read()
+        assert body == b"not found"
+        # regression: HTTP/1.1 keep-alive requires Content-Length on every response
+        assert int(e.headers.get("Content-Length", "0")) == len(body)
+
+
 def test_crud_and_authorization(server):
     base, root = server
     status, item, _ = _call(base, "/api/tux/feedback", "POST", "usr_a", {

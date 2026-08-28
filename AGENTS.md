@@ -49,7 +49,14 @@ cd js && npm run e2e             # Playwright suite (starts its own servers)
 # Regenerate artifacts after intentional changes (review the diff!)
 node tools/gen-expected.mjs --force   # conformance expectations (JS reference)
 node tools/gen-case-inputs.mjs        # fixture inputs (rarely; hand-authored)
-node tools/sync-artifacts.mjs         # client → py package, skills → deployments
+node tools/sync-artifacts.mjs         # client/templates/skills → py package + deployments
+
+# Packaging + release
+node tools/package-js.mjs             # npm tarball → dist/ + content inspection
+node tools/package-py.mjs             # sdist + wheel → dist/ + content inspection
+node tools/install-test.mjs           # dedicated-env install verification
+                                      # (real react/vue/angular builds served over HTTP)
+node tools/release.mjs <x.y.z>        # bump + test + package + install-test + tag/push
 ```
 
 ## Rules for agents
