@@ -38,7 +38,7 @@ resolved prefix.
 4. **Verify** with `tux live start-review --url <dev-server>`: create
    feedback on a page, a component instance and a modal; reload and
    confirm the markers restore; confirm
-   `tux feedback list --format json` returns the items with
+   `tux feedback show --format json` returns the items with
    `"origin": "live"`.
 5. **Accept**: report pages, components, routes and the verification
    result. Never report `passed` when persistence or route tracking

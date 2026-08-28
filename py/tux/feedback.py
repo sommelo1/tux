@@ -29,9 +29,18 @@ def _resolve_identity(config):
     return resolve_identity(config)
 
 
-def op_list(opts: dict, filters: dict) -> dict:
+def op_show(opts: dict, feedback_id: str | None, filters: dict | None = None) -> dict:
+    """``tux feedback show [feedback-id]`` (SPC section 42): with an ID,
+    print the complete canonical item (always canonical JSON, filters
+    ignored); without an ID, survey all items with composing filters."""
+    filters = filters or {}
     c = _ctx(opts)
     store = load_store(c["cwd"], c["config"])
+    if feedback_id:
+        for item in store["feedback"]:
+            if item["id"] == feedback_id:
+                return {"stdout": canonical_json(item) + "\n", "exit": Exit.OK}
+        raise CliError(Exit.NOT_FOUND, f"feedback not found: {feedback_id}")
     items = store["feedback"]
     if filters.get("status"):
         items = [f for f in items if f["status"] == filters["status"]]
@@ -54,15 +63,6 @@ def op_list(opts: dict, filters: dict) -> dict:
         for f in items
     ]
     return {"stdout": ("\n".join(lines) + "\n") if lines else "", "exit": Exit.OK}
-
-
-def op_show(opts: dict, feedback_id: str) -> dict:
-    c = _ctx(opts)
-    store = load_store(c["cwd"], c["config"])
-    for item in store["feedback"]:
-        if item["id"] == feedback_id:
-            return {"stdout": canonical_json(item) + "\n", "exit": Exit.OK}
-    raise CliError(Exit.NOT_FOUND, f"feedback not found: {feedback_id}")
 
 
 def op_create(opts: dict, spec: dict) -> dict:

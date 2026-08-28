@@ -1,7 +1,9 @@
 {
   "args": [
     "feedback",
-    "list"
+    "show",
+    "--route",
+    "/products"
   ],
   "env": {},
   "include": {

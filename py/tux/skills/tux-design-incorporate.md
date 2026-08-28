@@ -24,7 +24,7 @@ resolved prefix.
 ## Workflow
 
 1. Load the open design feedback in scope:
-   `tux feedback list --status open --origin design --format json`
+   `tux feedback show --status open --origin design --format json`
    (optionally `--mine`, `--route <route>`, `--session <name>`). The
    default scope is all open design feedback — not `--mine` (SPC
    section 52).

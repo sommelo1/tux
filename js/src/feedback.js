@@ -26,9 +26,19 @@ function ctx(opts) {
   };
 }
 
-export function opList(opts, filters) {
+/**
+ * `tux feedback show [feedback-id]` (SPC section 42): with an ID, print
+ * the complete canonical item (always canonical JSON, filters ignored);
+ * without an ID, survey all items with composing filters.
+ */
+export function opShow(opts, id, filters = {}) {
   const c = ctx(opts);
   const store = loadStore(c.cwd, c.config);
+  if (id) {
+    const item = store.feedback.find((f) => f.id === id);
+    if (!item) throw new CliError(EXIT.notFound, `feedback not found: ${id}`);
+    return { stdout: canonicalJson(item) + '\n', exit: EXIT.ok };
+  }
   let items = store.feedback;
   if (filters.status) items = items.filter((f) => f.status === filters.status);
   if (filters.type) items = items.filter((f) => f.feedback.type === filters.type);
@@ -41,14 +51,6 @@ export function opList(opts, filters) {
     [f.id, f.status, f.feedback.type, f.location?.route ?? '-', firstLine(f.feedback.text)].join('\t')
   );
   return { stdout: (lines.length ? lines.join('\n') + '\n' : ''), exit: EXIT.ok };
-}
-
-export function opShow(opts, id) {
-  const c = ctx(opts);
-  const store = loadStore(c.cwd, c.config);
-  const item = store.feedback.find((f) => f.id === id);
-  if (!item) throw new CliError(EXIT.notFound, `feedback not found: ${id}`);
-  return { stdout: canonicalJson(item) + '\n', exit: EXIT.ok };
 }
 
 export function opCreate(opts, spec) {

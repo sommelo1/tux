@@ -42,7 +42,7 @@ the canonical JSON output are the machine interface.
 6. **Tests**: add the required integration checks (loading, default
    activation, config activation, URL override, feedback
    create→persist→reload→CLI retrieval, route awareness, SPA navigation,
-   machine interface `tux feedback list --format json`).
+   machine interface `tux feedback show --format json`).
 7. **Run and verify** per SPC section 86: build/start, activate, create
    feedback on multiple routes, reload, verify persistence, verify CLI.
 8. **Accept**: report `passed`, `partial`, or `failed`. Never report

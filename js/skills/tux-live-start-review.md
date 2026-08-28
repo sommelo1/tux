@@ -37,6 +37,6 @@ resolved prefix.
 3. Hand the review URL to the reviewers. Runtime activation follows the
    canonical rules: config-disabled start is enabled ad hoc with
    `?tux=on`, disabled again with `?tux=off` (SPC section 89).
-4. Stop with `tux live stop` when the session ends. Stopping must never
+4. Stop with `tux live stop-review` when the session ends. Stopping must never
    delete feedback (SPC section 41).
 5. Report the review URL, session, target, and the verification result.

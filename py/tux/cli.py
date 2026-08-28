@@ -10,8 +10,7 @@ from __future__ import annotations
 from .config import load_config
 from .errors import CliError, Exit
 from .feedback import (op_clear, op_create, op_delete, op_export,
-                       op_incorporate, op_list, op_show, op_update,
-                       op_validate)
+                       op_incorporate, op_show, op_update, op_validate)
 from .design import op_design_create, op_design_install, op_design_start, op_design_status, op_design_stop, op_live_create
 from .live import op_live_install, op_live_start, op_live_status, op_live_stop
 
@@ -77,17 +76,13 @@ def run(argv: list[str], context: dict | None = None) -> dict:
         if domain == "feedback":
             config, config_path = load_config(cwd, flags)
             opts = {"cwd": cwd, "config": config, "config_path": config_path, "format": flags.get("format")}
-            if action == "list":
+            if action == "show":
                 opts["format"] = flags.get("format") or "text"
-                return _ok(op_list(opts, {
+                return _ok(op_show(opts, positional[2] if len(positional) > 2 else None, {
                     "status": flags.get("status"), "type": flags.get("type"),
                     "mine": bool(flags.get("mine")), "route": flags.get("route"),
                     "session": flags.get("session"), "origin": flags.get("origin"),
                 }))
-            if action == "show":
-                if len(positional) < 3:
-                    raise CliError(Exit.USAGE, "usage: tux feedback show <feedback-id>")
-                return _ok(op_show(opts, positional[2]))
             if action == "create":
                 return _ok(op_create(opts, {
                     "type": flags.get("type") or "issue",
@@ -173,7 +168,7 @@ def run(argv: list[str], context: dict | None = None) -> dict:
             if action == "status":
                 opts["format"] = flags.get("format") or "text"
                 return _ok(op_live_status(opts))
-            if action == "stop":
+            if action == "stop-review":
                 opts["format"] = flags.get("format") or "text"
                 return _ok(op_live_stop(opts))
             raise CliError(Exit.USAGE, f"unknown action: {action or '(missing)'} for domain {domain}")
@@ -200,9 +195,9 @@ def _help() -> str:
         "tux <domain> <action> [arguments] [options]",
         "",
         "domains:",
-        "  design    install | create | start-review | status | stop",
-        "  live      install | create | start-review | status | stop",
-        "  feedback  list | show | create | update | delete | clear | export | incorporate | validate",
+        "  design    install | create | start-review | status | stop-review",
+        "  live      install | create | start-review | status | stop-review",
+        "  feedback  show | create | update | delete | clear | export | incorporate | validate",
         "",
         "options:",
         "  --config <path>     project config (default: tux.config.json)",

@@ -1,7 +1,7 @@
 {
   "args": [
     "feedback",
-    "list",
+    "show",
     "--mine"
   ],
   "env": {

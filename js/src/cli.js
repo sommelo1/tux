@@ -9,7 +9,7 @@
  */
 import { CliError, EXIT } from './errors.js';
 import { loadConfig } from './config.js';
-import { opList, opShow, opCreate, opUpdate, opDelete, opClear, opExport, opIncorporate, opValidate } from './feedback.js';
+import { opShow, opCreate, opUpdate, opDelete, opClear, opExport, opIncorporate, opValidate } from './feedback.js';
 import { opDesignInstall, opDesignCreate, opLiveCreate, opDesignStart, opDesignStatus, opDesignStop } from './design.js';
 import { opLiveInstall, opLiveStart, opLiveStatus, opLiveStop } from './live.js';
 
@@ -91,16 +91,13 @@ export async function run(argv, context = {}) {
       const opts = optsFrom(cwd, config, configPath, flags);
       opts.format = requireFormat(flags, opts.format);
       switch (action) {
-        case 'list':
+        case 'show': {
+          const id = positional[2];
           opts.format = flags.format ?? 'text';
-          return opList(opts, {
+          return opShow(opts, id, {
             status: flags.status, type: flags.type, mine: flags.mine ?? false,
             route: flags.route, session: flags.session, origin: flags.origin,
           });
-        case 'show': {
-          const id = positional[2];
-          if (!id) throw new CliError(EXIT.usage, 'usage: tux feedback show <feedback-id>');
-          return opShow(opts, id);
         }
         case 'create':
           return opCreate(opts, {
@@ -193,7 +190,7 @@ export async function run(argv, context = {}) {
           opts.format = flags.format ?? 'text';
           return await opLiveStatus(opts);
         }
-        case 'stop': {
+        case 'stop-review': {
           opts.format = flags.format ?? 'text';
           return opLiveStop(opts);
         }
@@ -218,9 +215,9 @@ function help() {
     'tux <domain> <action> [arguments] [options]',
     '',
     'domains:',
-    '  design    install | create | start-review | status | stop',
-    '  live      install | create | start-review | status | stop',
-    '  feedback  list | show | create | update | delete | clear | export | incorporate | validate',
+    '  design    install | create | start-review | status | stop-review',
+    '  live      install | create | start-review | status | stop-review',
+    '  feedback  show | create | update | delete | clear | export | incorporate | validate',
     '',
     'options:',
     '  --config <path>     project config (default: tux.config.json)',

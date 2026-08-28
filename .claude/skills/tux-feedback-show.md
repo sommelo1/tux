@@ -1,13 +1,15 @@
 ---
 name: tux-feedback-show
-description: Show complete canonical feedback items by ID — single ID, a list of IDs, or all.
+description: Show TUX feedback — the complete canonical item by ID, or a filtered survey of all items with deterministic, machine-readable output.
 ---
 
 # tux-feedback-show
 
-Show complete canonical feedback items (SPC section 43). The output is
-the full item: location, target, UI state, author, status,
-incorporation and validation metadata.
+Show feedback items (SPC section 42): `tux feedback show` without an ID
+surveys all items with deterministic, machine-readable output;
+`tux feedback show <id>` prints the complete canonical item — location,
+target, UI state, author, status, incorporation and validation
+metadata.
 
 ## Resolve the CLI
 
@@ -23,18 +25,26 @@ resolved prefix.
 
 ## Workflow
 
-1. Show one item: `tux feedback show <feedback-id>` — prints the
-   complete canonical JSON of that item.
-2. Show several items: repeat the command per ID
-   (`tux feedback show <id-1>`, `tux feedback show <id-2>`), or collect
-   the full set with `tux feedback list --format json` and read the
-   matching entries.
-3. Show everything: `tux feedback list --format json` returns all items
-   as a canonical JSON array; narrow it with `--origin design|live`,
-   `--route`, `--session`, `--status` or `--mine` instead of reading
-   everything.
-4. A missing ID fails with exit code 6 and
+1. Run `tux feedback show --format json` for the full survey. The output
+   is a canonical JSON array: fixed key order, no locale, no timestamps
+   beyond the stored ones.
+2. Narrow the survey with filters — they compose:
+   `--status open|incorporated|resolved|rejected`,
+   `--type change|issue|question|approval`,
+   `--origin design|live`,
+   `--route <route>`,
+   `--session <name>`,
+   `--mine` (current identity).
+3. Prefer explicit filters over post-filtering the JSON: the CLI output
+   is byte-identical between the Node and Python implementations and
+   safe to parse with any tool.
+4. Show one item: `tux feedback show <feedback-id>` — prints the
+   complete canonical JSON of that item. Filters and `--format` do not
+   apply in ID mode.
+5. A missing ID fails with exit code 6 and
    `error: feedback not found: <id>` on stderr — report it, never
    guess.
-5. Cite item IDs verbatim in your report; the ID is the stable
-   reference across incorporation and validation.
+6. Cite item IDs verbatim in your report; the ID is the stable
+   reference across incorporation and validation. Use `tux feedback
+   incorporate --strategy export-only --format json` to see
+   grouping/duplicates/conflicts before deciding.

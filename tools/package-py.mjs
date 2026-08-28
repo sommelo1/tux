@@ -78,8 +78,9 @@ required = [
     'tux/templates/angular/angular.json',
 ]
 required += [f'tux/skills/tux-{s}.md' for s in (
-    'design-create', 'design-integrate', 'design-serve',
-    'feedback-incorporate', 'feedback-validate', 'review-integrate', 'review-start')]
+    'design-create', 'design-incorporate', 'design-install', 'design-start-review',
+    'feedback-delete', 'feedback-export', 'feedback-show',
+    'live-create', 'live-incorporate', 'live-install', 'live-start-review')]
 wheel_missing = sorted(n for n in required if n not in wheel_names)
 sdist_missing = sorted(n for n in required if not any(n in item for item in sdist_names))
 forbidden_prefixes = ('tux/tests/', 'conformance/', 'node_modules/')

@@ -302,8 +302,6 @@ stop
 
 status
 
-list
-
 show
 
 update
@@ -1746,7 +1744,7 @@ tux
 
 │   ├── status
 
-│   └── stop
+│   └── stop-review
 
 │
 
@@ -1760,13 +1758,11 @@ tux
 
 │   ├── status
 
-│   └── stop
+│   └── stop-review
 
 │
 
 └── feedback
-
-&#x20;   ├── list
 
 &#x20;   ├── show
 
@@ -2488,7 +2484,7 @@ tux design start-review --session checkout-review
 
 
 
-`tux design start-review` starts the design server detached, writes the server state file and returns. `tux design status` and `tux design stop` manage that state with the same semantics as `tux live status` and `tux live stop`; `--foreground` keeps the blocking behavior.
+`tux design start-review` starts the design server detached, writes the server state file and returns. `tux design status` and `tux design stop-review` manage that state with the same semantics as `tux live status` and `tux live stop-review`; `--foreground` keeps the blocking behavior.
 
 \---
 
@@ -2592,13 +2588,13 @@ Returns information including:
 
 
 
-\# 41. `tux live stop`
+\# 41. `tux live stop-review`
 
 
 
 ```bash
 
-tux live stop
+tux live stop-review
 
 ```
 
@@ -2616,13 +2612,13 @@ It must not delete feedback.
 
 
 
-\# 42. `tux feedback list`
+\# 42. `tux feedback show`
 
 
 
 ```bash
 
-tux feedback list
+tux feedback show [feedback-id]
 
 ```
 
@@ -2640,13 +2636,13 @@ It performs no semantic incorporation.
 
 
 
-Examples:
+Without a feedback ID it surveys feedback. The survey accepts composing filters:
 
 
 
 ```bash
 
-tux feedback list --status open
+tux feedback show --status open
 
 ```
 
@@ -2654,7 +2650,7 @@ tux feedback list --status open
 
 ```bash
 
-tux feedback list --mine
+tux feedback show --mine
 
 ```
 
@@ -2662,7 +2658,7 @@ tux feedback list --mine
 
 ```bash
 
-tux feedback list --route /checkout
+tux feedback show --route /checkout
 
 ```
 
@@ -2670,7 +2666,7 @@ tux feedback list --route /checkout
 
 ```bash
 
-tux feedback list --session review-2026-08-28
+tux feedback show --session review-2026-08-28
 
 ```
 
@@ -2682,9 +2678,13 @@ Machine-readable:
 
 ```bash
 
-tux feedback list --format json
+tux feedback show --format json
 
 ```
+
+
+
+With a feedback ID it returns the complete canonical feedback item. The ID mode always prints canonical JSON, ignores `--format` and the survey filters. An unknown ID fails with exit code 6.
 
 
 
@@ -2692,19 +2692,11 @@ tux feedback list --format json
 
 
 
-\# 43. `tux feedback show`
+\# 43. Reserved
 
 
 
-```bash
-
-tux feedback show <feedback-id>
-
-```
-
-
-
-Returns the complete canonical feedback item.
+Merged into section 42: survey and single-item lookup are one action (`tux feedback show`).
 
 
 
@@ -2906,7 +2898,7 @@ Canonical semantic distinctions:
 
 ```text
 
-list
+show
 
 = inspect
 
@@ -4628,7 +4620,7 @@ Workflow:
 
 ```text
 
-tux feedback list --status open --format json
+tux feedback show --status open --format json
 
 ↓
 
@@ -4904,7 +4896,7 @@ Server/application restart must not remove persisted feedback.
 
 ```bash
 
-tux feedback list --format json
+tux feedback show --format json
 
 ```
 
@@ -5086,7 +5078,7 @@ CLI:
 
 ```bash
 
-tux feedback list --format json
+tux feedback show --format json
 
 ```
 
@@ -5220,7 +5212,7 @@ Agent uses:
 
 ```bash
 
-tux feedback list --status open --format json
+tux feedback show --status open --format json
 
 ```
 
@@ -5342,57 +5334,53 @@ Initial MVP should provide:
 
 20\. `tux live status`;
 
-21\. `tux live stop`;
+21\. `tux live stop-review`;
 
-22\. `tux feedback list`;
+22\. `tux feedback show`;
 
-23\. `tux feedback show`;
+23\. `tux feedback delete`;
 
-24\. `tux feedback delete`;
+24\. `tux feedback clear`;
 
-25\. `tux feedback clear`;
+25\. `tux feedback export`;
 
-26\. `tux feedback export`;
+26\. `tux feedback incorporate`;
 
-27\. `tux feedback incorporate`;
+27\. `tux feedback validate`;
 
-28\. `tux feedback validate`;
+28\. canonical JSON output;
 
-29\. canonical JSON output;
+29\. config activation;
 
-30\. config activation;
+30\. URL runtime override;
 
-31\. URL runtime override;
+31\. build-time exclusion;
 
-32\. build-time exclusion;
+32\. `tux-design-install`;
 
-33\. `tux-design-install`;
+33\. `tux-live-install`;
 
-34\. `tux-live-install`;
+34\. `tux-design-create`;
 
-35\. `tux-design-create`;
+35\. `tux-design-incorporate`;
 
-36\. `tux-design-incorporate`;
+36\. `tux-live-incorporate`;
 
-37\. `tux-live-incorporate`;
+37\. `tux live create`;
 
-38\. `tux live create`;
+38\. `tux design status`;
 
-39\. `tux design status`;
+39\. `tux design stop-review`;
 
-40\. `tux design stop`;
+40\. `tux-feedback-show`;
 
-41\. `tux-feedback-list`;
+41\. `tux-feedback-delete`;
 
-42\. `tux-feedback-show`;
+42\. `tux-feedback-export`;
 
-43\. `tux-feedback-delete`;
+43\. integration test contracts;
 
-44\. `tux-feedback-export`;
-
-45\. integration test contracts;
-
-46\. acceptance verification.
+44\. acceptance verification.
 
 
 
@@ -5568,7 +5556,7 @@ There is no separate global integration Skill.
 
 ```text
 
-list
+show
 
 → inspect
 

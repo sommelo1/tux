@@ -40,6 +40,6 @@ resolved prefix.
 6. Run `tux design start-review`, navigate every route, and verify the
    review capability: create feedback on a component, reload, see the
    marker restored, and confirm
-   `tux feedback list --format json` returns it.
+   `tux feedback show --format json` returns it.
 7. Report the created routes, components, and UI states with the
    verification result.

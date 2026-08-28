@@ -49,7 +49,7 @@ resolved prefix.
    create→persist→reload→retrieve, editing, deletion (`delete one`,
    `clear --mine`, `clear --all`), route awareness, SPA navigation,
    component instance identity, UI state, persistence across restart,
-   and `tux feedback list --format json` producing valid canonical JSON.
+   and `tux feedback show --format json` producing valid canonical JSON.
 7. **Run and verify** per SPC sections 86–87, then security-check
    (section 70): runtime disabling is not removal; recommend build
    exclusion for environments that do not need TUX.

@@ -24,7 +24,7 @@ resolved prefix.
 ## Workflow
 
 1. Load the open live feedback in scope:
-   `tux feedback list --status open --origin live --format json`
+   `tux feedback show --status open --origin live --format json`
    (optionally `--mine`, `--route <route>`, `--session <name>`). The
    default scope is all open live feedback — not `--mine` (SPC
    section 52).

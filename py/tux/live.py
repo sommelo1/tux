@@ -1,4 +1,4 @@
-"""``tux live <action>`` — install, create, start-review, status, stop (SPC sections 32–41).
+"""``tux live <action>`` — install, create, start-review, status, stop-review (SPC sections 32–41).
 Also hosts the shared server lifecycle used by ``tux design start-review``."""
 from __future__ import annotations
 

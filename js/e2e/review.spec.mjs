@@ -54,7 +54,7 @@ test('create → persist → reload → restore across routes and modal (SPC 85,
   await expect(page.locator('.tux-marker')).toHaveCount(1);
 
   // 5) machine interface: CLI sees both items with route + ui_state (SPC 42, 85)
-  const list = JSON.parse(tux('feedback list --format json'));
+  const list = JSON.parse(tux('feedback show --format json'));
   expect(list).toHaveLength(2);
   const productItem = list.find((f) => f.location.route === '/products');
   const modalItem = list.find((f) => f.location.route === '/checkout');
@@ -87,7 +87,7 @@ test('edit and delete own feedback via marker flyout', async ({ page }) => {
   await page.locator('[data-ed-text]').fill('Edited text');
   await page.locator('[data-act="save"]').click();
   await expect(page.locator('.tux-editor')).toHaveCount(0);
-  const list = JSON.parse(tux('feedback list --format json'));
+  const list = JSON.parse(tux('feedback show --format json'));
   expect(list[0].feedback.text).toBe('Edited text');
 
   // delete
@@ -96,7 +96,7 @@ test('edit and delete own feedback via marker flyout', async ({ page }) => {
   await page.locator('[data-act="delete"]').click();
   await expect(page.locator('.tux-editor')).toHaveCount(0);
   await expect(page.locator('.tux-marker')).toHaveCount(0);
-  const after = JSON.parse(tux('feedback list --format json'));
+  const after = JSON.parse(tux('feedback show --format json'));
   expect(after).toHaveLength(0);
 });
 

@@ -131,11 +131,11 @@ w('feedback/create-basic/case.json', {
 });
 w('feedback/create-invalid-type/case.json', { args: ['feedback', 'create', '--type', 'bogus', '--text', 'x'], env: {} });
 w('feedback/create-missing-text/case.json', { args: ['feedback', 'create', '--type', 'change'], env: {} });
-w('feedback/list-empty/case.json', { args: ['feedback', 'list', '--format', 'json'], env: {} });
-w('feedback/list-filter-status/case.json', { args: ['feedback', 'list', '--status', 'open', '--format', 'json'], env: {}, include: { '.tux/feedback.json': S3 } });
-w('feedback/list-filter-mine/case.json', { args: ['feedback', 'list', '--mine'], env: { TUX_USER_ID: 'usr_8f3a12' }, include: { '.tux/feedback.json': S3 } });
-w('feedback/list-text/case.json', { args: ['feedback', 'list'], env: {}, include: { '.tux/feedback.json': S3 } });
-w('feedback/list-route/case.json', { args: ['feedback', 'list', '--route', '/products'], env: {}, include: { '.tux/feedback.json': S3 } });
+w('feedback/show-empty/case.json', { args: ['feedback', 'show', '--format', 'json'], env: {} });
+w('feedback/show-filter-status/case.json', { args: ['feedback', 'show', '--status', 'open', '--format', 'json'], env: {}, include: { '.tux/feedback.json': S3 } });
+w('feedback/show-filter-mine/case.json', { args: ['feedback', 'show', '--mine'], env: { TUX_USER_ID: 'usr_8f3a12' }, include: { '.tux/feedback.json': S3 } });
+w('feedback/show-text/case.json', { args: ['feedback', 'show'], env: {}, include: { '.tux/feedback.json': S3 } });
+w('feedback/show-route/case.json', { args: ['feedback', 'show', '--route', '/products'], env: {}, include: { '.tux/feedback.json': S3 } });
 w('feedback/show/case.json', { args: ['feedback', 'show', A], env: {}, include: { '.tux/feedback.json': S3 } });
 w('feedback/show-missing/case.json', { args: ['feedback', 'show', 'fb_MISSING000000000000000000'], env: {}, include: { '.tux/feedback.json': S3 } });
 w('feedback/update-status/case.json', { args: ['feedback', 'update', A, '--status', 'incorporated'], env: { TUX_TIME_OVERRIDE: '2026-08-28T13:00:00Z' }, include: { '.tux/feedback.json': S3 } });

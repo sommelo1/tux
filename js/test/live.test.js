@@ -1,5 +1,5 @@
 /**
- * Process-level integration tests: `tux review start/status/stop` with a
+ * Process-level integration tests: `tux live start-review/status/stop-review` with a
  * real proxied application, injection through the proxy, feedback
  * persistence across a server restart (SPC sections 39–41, 85, 89).
  *
@@ -64,7 +64,7 @@ test('live start-review → proxy injects client → status → persistence acro
   const state = JSON.parse(started.stdout);
   assert.equal(state.state ?? undefined, undefined);
   assert.equal(state.session_id, 'integration');
-  cleanups.push(() => tux(['live', 'stop', '--format', 'json'], work));
+  cleanups.push(() => tux(['live', 'stop-review', '--format', 'json'], work));
   await waitFor('http://127.0.0.1:4186/api/tux/health');
 
   // 2) the application stays functional and gets the client injected
@@ -89,7 +89,7 @@ test('live start-review → proxy injects client → status → persistence acro
   assert.equal(status1.session_id, 'integration');
 
   // 5) stop; feedback survives (SPC 41)
-  const stopped = JSON.parse(tux(['live', 'stop', '--format', 'json'], work).stdout);
+  const stopped = JSON.parse(tux(['live', 'stop-review', '--format', 'json'], work).stdout);
   assert.equal(stopped.stopped, true);
   await new Promise((r) => setTimeout(r, 500));
   const status2 = JSON.parse(tux(['live', 'status', '--format', 'json'], work).stdout);
@@ -105,7 +105,7 @@ test('live start-review → proxy injects client → status → persistence acro
   await waitFor('http://127.0.0.1:4186/api/tux/health');
   const status3 = JSON.parse(tux(['live', 'status', '--format', 'json'], work).stdout);
   assert.equal(status3.feedback_count, 1);
-  tux(['live', 'stop'], work);
+  tux(['live', 'stop-review'], work);
 });
 
 test('live start-review --dry-run prints the plan without side effects (SPC 39)', async () => {

@@ -1,5 +1,5 @@
-"""Process-level integration tests for `tux review start/status/stop`
-— mirror of js/test/review.test.js."""
+"""Process-level integration tests for `tux live start-review/status/stop-review`
+— mirror of js/test/live.test.js."""
 from __future__ import annotations
 
 import json
@@ -94,7 +94,7 @@ def test_review_lifecycle(app_server, tmp_path: Path):
         assert status1["state"] == "running"
         assert status1["feedback_count"] == 1
     finally:
-        stopped = tux(["live", "stop", "--format", "json"], work)
+        stopped = tux(["live", "stop-review", "--format", "json"], work)
         assert stopped.returncode == 0
     assert json.loads(stopped.stdout)["stopped"] is True
     time.sleep(0.5)
@@ -111,7 +111,7 @@ def test_review_lifecycle(app_server, tmp_path: Path):
         status3 = json.loads(tux(["live", "status", "--format", "json"], work).stdout)
         assert status3["feedback_count"] == 1
     finally:
-        tux(["live", "stop"], work)
+        tux(["live", "stop-review"], work)
 
 
 def test_review_start_dry_run(tmp_path: Path):

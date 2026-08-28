@@ -1,4 +1,4 @@
-"""``tux design <action>`` — install, create, start-review, status, stop (SPC sections 28–38).
+"""``tux design <action>`` — install, create, start-review, status, stop-review (SPC sections 28–38).
 ``tux live create`` (SPC section 32) shares the create primitive with ``"kind": "live"``."""
 from __future__ import annotations
 

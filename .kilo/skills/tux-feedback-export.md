@@ -28,9 +28,9 @@ resolved prefix.
 2. Export line-delimited for streaming/line tools:
    `tux feedback export --format jsonl` — one compact JSON object per
    line, keys in schema order.
-3. Scope the export the same way as listing: `--origin design|live`,
+3. Scope the export the same way as the survey: `--origin design|live`,
    `--route`, `--session`, `--status`, `--mine` (export composes with
-   the list filters; use `tux feedback list` first if you need the
+   the show filters; use `tux feedback show` first if you need the
    filtered view for orientation).
 4. Redirect the stream to a file when the user asked for an artifact:
    `tux feedback export --format json > tux-feedback.json`. The output

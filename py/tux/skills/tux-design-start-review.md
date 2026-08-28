@@ -29,7 +29,7 @@ resolved prefix.
    server hosts the design, injects the Review Client, exposes the
    feedback API, and persists to the configured store.
 2. Manage the lifecycle: `tux design status` reports running state with
-   URL, session and feedback count; `tux design stop` stops it. Stopping
+   URL, session and feedback count; `tux design stop-review` stops it. Stopping
    never deletes feedback.
 3. Verify activation: the client must load without `?tux=on` when the
    config is default-enabled (SPC section 64), and must stay inert with
@@ -39,7 +39,7 @@ resolved prefix.
    on a button, open the modal, comment inside the modal, reload,
    revisit the routes — all markers must reappear in the correct
    context.
-5. Verify the machine interface: `tux feedback list --format json` must
+5. Verify the machine interface: `tux feedback show --format json` must
    return all feedback created in the browser, with routes, components,
    and UI state attached.
 6. Report the review URL, session name, feedback count, and the
