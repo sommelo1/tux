@@ -7,7 +7,7 @@ from pathlib import Path
 from .canonical import canonical_json
 from .config import CONFIG_FILE, default_config
 from .errors import CliError, Exit
-from .templates import SUPPORTED_FRAMEWORKS, vanilla_template
+from .templates import SUPPORTED_FRAMEWORKS, design_template
 
 
 def _text_report(lines: list[str]) -> dict:
@@ -65,7 +65,7 @@ def op_design_create(opts: dict, spec: dict) -> dict:
     design_dir = cwd / root / name / "design"
     if design_dir.exists():
         raise CliError(Exit.CONFLICT, f"design directory already exists: {root}/{name}/design")
-    for rel, content in vanilla_template().items():
+    for rel, content in design_template(framework).items():
         p = design_dir / rel
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(content, encoding="utf-8", newline="\n")

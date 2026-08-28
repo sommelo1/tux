@@ -8,7 +8,7 @@ import { join, relative, resolve } from 'node:path';
 import { CliError, EXIT } from './errors.js';
 import { canonicalJson } from './canonical.js';
 import { CONFIG_FILE, defaultConfig } from './config.js';
-import { SUPPORTED_FRAMEWORKS, vanillaTemplate } from './templates.js';
+import { SUPPORTED_FRAMEWORKS, designTemplate } from './templates.js';
 
 function textReport(lines) {
   return { stdout: lines.join('\n') + '\n', exit: EXIT.ok };
@@ -70,7 +70,7 @@ export function opDesignCreate(opts, spec) {
   if (existsSync(designDir)) {
     throw new CliError(EXIT.conflict, `design directory already exists: ${root}/${spec.name}/design`);
   }
-  const files = vanillaTemplate();
+  const files = designTemplate(framework);
   for (const [rel, content] of Object.entries(files)) {
     const p = join(designDir, rel);
     mkdirSync(join(p, '..'), { recursive: true });
