@@ -825,9 +825,11 @@ The corresponding canonical Skills are:
 tux-design-install
 tux-design-create
 tux-design-start-review
+tux-design-stop-review
 tux-live-install
 tux-live-create
 tux-live-start-review
+tux-live-stop-review
 tux-design-incorporate
 tux-live-incorporate
 ```
@@ -2454,11 +2456,13 @@ Initial MVP should provide:
 37. `tux live create`;
 38. `tux design status`;
 39. `tux design stop-review`;
-40. `tux-feedback-show`;
-41. `tux-feedback-delete`;
-42. `tux-feedback-export`;
-43. integration test contracts;
-44. acceptance verification.
+40. `tux-design-stop-review`;
+41. `tux-live-stop-review`;
+42. `tux-feedback-show`;
+43. `tux-feedback-delete`;
+44. `tux-feedback-export`;
+45. integration test contracts;
+46. acceptance verification.
 
 Vue and Angular should follow using the same contracts.
 

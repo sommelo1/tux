@@ -73,7 +73,7 @@ const required = [
   'templates/angular/angular.json',
   'README.md', 'package.json',
 ];
-const skills = ['design-create', 'design-incorporate', 'design-install', 'design-start-review', 'feedback-delete', 'feedback-export', 'feedback-show', 'live-create', 'live-incorporate', 'live-install', 'live-start-review'];
+const skills = ['design-create', 'design-incorporate', 'design-install', 'design-start-review', 'design-stop-review', 'feedback-delete', 'feedback-export', 'feedback-show', 'live-create', 'live-incorporate', 'live-install', 'live-start-review', 'live-stop-review'];
 for (const s of skills) required.push(`skills/tux-${s}.md`);
 
 const missing = required.filter((name) => !files.includes(name));

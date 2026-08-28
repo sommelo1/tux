@@ -249,7 +249,7 @@ environment): `TUX_CONFIG`, `TUX_PROJECT_ID`, `TUX_STORE`, `TUX_HOST`,
 
 ## Skills for agents
 
-Eleven canonical skills in `skills/` describe agent workflows 1:1 on the
+Thirteen canonical skills in `skills/` describe agent workflows 1:1 on the
 CLI — the naming rule is `tux <domain> <action>` ↔ `tux-<domain>-<action>`:
 
 | Phase | Skills |
@@ -257,6 +257,7 @@ CLI — the naming rule is `tux <domain> <action>` ↔ `tux-<domain>-<action>`:
 | Install | `tux-design-install` · `tux-live-install` |
 | Create | `tux-design-create` · `tux-live-create` |
 | Start review | `tux-design-start-review` · `tux-live-start-review` |
+| Stop review | `tux-design-stop-review` · `tux-live-stop-review` |
 | Incorporate (incl. verification) | `tux-design-incorporate` · `tux-live-incorporate` |
 | Feedback read/cleanup | `tux-feedback-show` · `tux-feedback-delete` · `tux-feedback-export` |
 

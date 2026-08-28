@@ -24,7 +24,7 @@ const check = (ok, msg) => {
 // ─── skill sources: contract (frontmatter, title, Resolve the CLI, Workflow) ───
 const skillsDir = join(repo, 'skills');
 const sources = existsSync(skillsDir) ? readdirSync(skillsDir).filter((f) => f.endsWith('.md')) : [];
-check(sources.length === 11, `11 canonical skills exist (found ${sources.length})`);
+check(sources.length === 13, `13 canonical skills exist (found ${sources.length})`);
 const requiredSections = ['## Resolve the CLI', '## Workflow'];
 for (const name of sources) {
   const text = readFileSync(join(skillsDir, name), 'utf8');
