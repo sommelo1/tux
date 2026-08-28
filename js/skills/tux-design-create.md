@@ -26,10 +26,11 @@ resolved prefix.
    `requirements/<feature>/requirements.md`). Identify screens, routes,
    components, interactions, and UI states.
 2. Choose the framework from the requirements or ask:
-   `tux design create --framework vanilla|react --name <slug>`.
+   `tux design create --framework vanilla|react|vue|angular`.
 3. Run the command — it scaffolds `requirements/<slug>/design/` with a
    runnable multi-route design (vanilla: History-API SPA with tabs and a
-   modal) and TUX targeting attributes
+   modal; react/vue: vite scaffolds; angular: standalone component
+   scaffold) and TUX targeting attributes
    (`data-tux-id`, `data-tux-component`, `data-tux-instance`).
 4. **Implement the screens**: replace placeholder content with the
    requirements-derived pages, keep the route structure, wire real

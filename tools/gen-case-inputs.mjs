@@ -159,6 +159,8 @@ w('config/env-beats-config/case.json', {
 w('design/integrate-basic/case.json', { args: ['design', 'integrate', '--framework', 'vanilla', '--format', 'json'], env: { TUX_TIME_OVERRIDE: '2026-08-28T12:00:00Z' }, files: {} });
 w('design/create-vanilla/case.json', { args: ['design', 'create', '--framework', 'vanilla', '--name', 'checkout', '--format', 'json'], env: { TUX_TIME_OVERRIDE: '2026-08-28T12:00:00Z' }, files: { 'tux.config.json': JSON.stringify({ project_id: 'shop' }, null, 2) + '\n' } });
 w('design/create-react/case.json', { args: ['design', 'create', '--framework', 'react', '--name', 'checkout', '--format', 'json'], env: { TUX_TIME_OVERRIDE: '2026-08-28T12:00:00Z' }, files: { 'tux.config.json': JSON.stringify({ project_id: 'shop' }, null, 2) + '\n' } });
+w('design/create-vue/case.json', { args: ['design', 'create', '--framework', 'vue', '--name', 'checkout', '--format', 'json'], env: { TUX_TIME_OVERRIDE: '2026-08-28T12:00:00Z' }, files: { 'tux.config.json': JSON.stringify({ project_id: 'shop' }, null, 2) + '\n' } });
+w('design/create-angular/case.json', { args: ['design', 'create', '--framework', 'angular', '--name', 'checkout', '--format', 'json'], env: { TUX_TIME_OVERRIDE: '2026-08-28T12:00:00Z' }, files: { 'tux.config.json': JSON.stringify({ project_id: 'shop' }, null, 2) + '\n' } });
 w('design/create-unknown/case.json', { args: ['design', 'create', '--framework', 'svelte', '--name', 'x'], env: {} });
 w('review/status-stopped/case.json', { args: ['review', 'status', '--format', 'json'], env: {} });
 w('review/start-dry-run/case.json', { args: ['review', 'start', '--url', 'http://localhost:3000', '--dry-run', '--format', 'json'], env: { TUX_TIME_OVERRIDE: '2026-08-28T12:00:00Z' } });

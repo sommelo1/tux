@@ -52,3 +52,17 @@ def test_client_is_byte_identical_in_py_package():
     py_client = REPO / "py" / "tux" / "client"
     for f in sorted(js_client.iterdir()):
         assert _read(f) == _read(py_client / f.name), f"client/{f.name} differs in py package"
+
+
+def test_design_templates_are_byte_identical_in_py_package():
+    js_templates = REPO / "js" / "templates"
+    py_templates = REPO / "py" / "tux" / "templates"
+    frameworks = sorted(p.name for p in js_templates.iterdir() if p.is_dir())
+    assert {"vanilla", "react", "vue", "angular"} <= set(frameworks)
+    for fw in frameworks:
+        js_files = sorted(p for p in (js_templates / fw).rglob("*") if p.is_file())
+        assert js_files, f"template {fw} is empty"
+        for src in js_files:
+            mirror = py_templates / fw / src.relative_to(js_templates / fw)
+            assert mirror.exists(), f"{mirror} missing"
+            assert _read(src) == _read(mirror), f"template {fw}/{src.name} differs in py package"

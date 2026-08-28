@@ -1,0 +1,12 @@
+exit 0
+{
+  "action": "create",
+  "kind": "design",
+  "framework": "vue",
+  "name": "checkout",
+  "root": "requirements/checkout/design",
+  "next": [
+    "tux design serve",
+    "review in the browser"
+  ]
+}

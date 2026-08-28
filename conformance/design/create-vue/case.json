@@ -1,0 +1,18 @@
+{
+  "args": [
+    "design",
+    "create",
+    "--framework",
+    "vue",
+    "--name",
+    "checkout",
+    "--format",
+    "json"
+  ],
+  "env": {
+    "TUX_TIME_OVERRIDE": "2026-08-28T12:00:00Z"
+  },
+  "files": {
+    "tux.config.json": "{\n  \"project_id\": \"shop\"\n}\n"
+  }
+}

@@ -19,6 +19,11 @@ for (const f of readdirSync(join(repo, 'js', 'client'))) {
 }
 console.log('synced js/client → py/tux/client');
 
+// 1b) Design templates → Python package
+rmSync(join(repo, 'py', 'tux', 'templates'), { recursive: true, force: true });
+cpSync(join(repo, 'js', 'templates'), join(repo, 'py', 'tux', 'templates'), { recursive: true });
+console.log('synced js/templates → py/tux/templates');
+
 // 2) Skills → deployment locations (js package, py package, tool skills dirs)
 const skillsDir = join(repo, 'skills');
 if (existsSync(skillsDir)) {

@@ -27,6 +27,7 @@
     "bin",
     "src",
     "client",
+    "templates",
     "skills",
     "README.md"
   ],

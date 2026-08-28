@@ -4,7 +4,7 @@
  *
  * @module test.skills
  */
-import { readFileSync, readdirSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -68,6 +68,28 @@ for (const f of readdirSync(join(jsRoot, 'client'))) {
   const a = readFileSync(join(jsRoot, 'client', f));
   const b = readFileSync(join(repo, 'py', 'tux', 'client', f));
   check(a.equals(b), `client/${f}: byte-identical in py package`);
+}
+
+// ─── design templates sync (js/templates → py/tux/templates) ───
+const tplDir = join(jsRoot, 'templates');
+const frameworks = readdirSync(tplDir).filter((f) => statSync(join(tplDir, f)).isDirectory());
+check(frameworks.length >= 4, `at least 4 design templates exist (found ${frameworks.join(', ')})`);
+for (const fw of frameworks) {
+  check(['vanilla', 'react', 'vue', 'angular'].includes(fw), `template ${fw}: supported framework`);
+  checkTemplateTree(join(tplDir, fw), join(repo, 'py', 'tux', 'templates', fw), `template ${fw}`);
+}
+
+function checkTemplateTree(src, mirror, label) {
+  for (const entry of readdirSync(src)) {
+    const s = join(src, entry);
+    const m = join(mirror, entry);
+    if (statSync(s).isDirectory()) {
+      checkTemplateTree(s, m, label);
+      continue;
+    }
+    const ok = existsSync(m) && readFileSync(s).equals(readFileSync(m));
+    check(ok, `${label}/${entry}: byte-identical in py package`);
+  }
 }
 
 console.log(failures === 0 ? '\nall artifact identity checks passed' : `\n${failures} artifact identity failure(s)`);

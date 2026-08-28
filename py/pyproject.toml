@@ -44,4 +44,4 @@ where = ["."]
 include = ["tux*"]
 
 [tool.setuptools.package-data]
-tux = ["skills/*.md", "client/*.js"]
+tux = ["skills/*.md", "client/*.js", "client/*.css", "templates/**/*"]

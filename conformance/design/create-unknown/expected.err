@@ -1,2 +1,2 @@
 exit 2
-error: unsupported framework: svelte (expected vanilla, react)
+error: unsupported framework: svelte (expected vanilla, react, vue, angular)

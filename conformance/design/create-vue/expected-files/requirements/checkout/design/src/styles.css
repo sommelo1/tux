@@ -1,0 +1,11 @@
+/* Clickable design styles (minimal). */
+:root { font-family: system-ui, sans-serif; }
+body { margin: 0; color: #1e1e1e; }
+nav { display: flex; gap: 16px; padding: 12px 20px; border-bottom: 1px solid rgba(0,0,0,.12); }
+main { padding: 20px; }
+[role=tablist] { display: flex; gap: 8px; margin-bottom: 12px; }
+[role=tab] { padding: 6px 14px; border: 1px solid rgba(0,0,0,.12); background: #fff; border-radius: 999px; cursor: pointer; }
+[role=tab][aria-selected=true] { background: #569cd6; color: #fff; border-color: #569cd6; }
+li { margin: 8px 0; display: flex; gap: 12px; }
+[role=dialog] { border: 1px solid rgba(0,0,0,.12); border-radius: 12px; padding: 20px; }
+button { font: inherit; }
