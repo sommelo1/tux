@@ -1,0 +1,93 @@
+/* TUX Review Client styles — scoped under #tux-root + .tux-* classes.
+ * Themeable via --tux-* tokens; host values win (Application Isolation,
+ * SPC section 61). No global element selectors are touched. */
+
+#tux-root {
+  --tux-primary: var(--primary, #569cd6);
+  --tux-surface: var(--card-bg, #fff);
+  --tux-surface2: var(--chip-bg, #f0f2f5);
+  --tux-border: var(--card-border, rgba(0, 0, 0, .12));
+  --tux-text: var(--on-surface, #1e1e1e);
+  --tux-muted: var(--outline, #6e6e6e);
+  --tux-danger: #c62828;
+  --tux-green: #2e7d32;
+  --tux-yellow: #f9a825;
+  --tux-radius: 12px;
+  --tux-shadow: 0 4px 16px rgba(0, 0, 0, .16);
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--tux-text);
+}
+
+#tux-root .tux-launcher {
+  position: fixed; right: 14px; bottom: 14px; z-index: 2147483000;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--tux-border); cursor: pointer;
+  background: var(--tux-surface); color: var(--tux-primary);
+  font-size: 20px; box-shadow: var(--tux-shadow);
+}
+#tux-root .tux-launcher.tux-active { background: var(--tux-primary); color: #fff; }
+
+body.tux-mode * { cursor: crosshair !important; }
+#tux-root .tux-hover { outline: 2px dashed var(--tux-primary) !important; outline-offset: -2px; }
+
+#tux-root .tux-layer { position: absolute; left: 0; top: 0; }
+
+#tux-root .tux-marker {
+  position: absolute; z-index: 2147483001;
+  min-width: 22px; height: 22px; padding: 0 4px; border-radius: 11px;
+  border: 2px solid var(--tux-surface); background: var(--tux-yellow);
+  color: #000; font-size: 11px; font-weight: 700; cursor: pointer;
+  box-shadow: var(--tux-shadow);
+}
+#tux-root .tux-marker.tux-resolved { background: var(--tux-green); color: #fff; }
+
+#tux-root .tux-editor {
+  display: none; position: absolute; z-index: 2147483002;
+  width: 300px; padding: 12px; border-radius: var(--tux-radius);
+  border: 1px solid var(--tux-border); background: var(--tux-surface);
+  box-shadow: var(--tux-shadow); text-align: left;
+}
+#tux-root .tux-editor.tux-open { display: block; }
+#tux-root .tux-ed-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--tux-muted); margin-bottom: 6px; }
+#tux-root .tux-ed-target { font-size: 11px; color: var(--tux-muted); background: var(--tux-surface2); border-radius: 8px; padding: 6px 8px; margin-bottom: 8px; word-break: break-all; }
+#tux-root .tux-ed-row { display: flex; gap: 8px; align-items: center; font-size: 12px; margin-bottom: 8px; color: var(--tux-muted); }
+#tux-root .tux-editor select, #tux-root .tux-editor textarea {
+  font: inherit; color: var(--tux-text); background: var(--tux-surface);
+  border: 1px solid var(--tux-border); border-radius: 8px; padding: 6px 8px;
+}
+#tux-root .tux-editor textarea { width: 100%; min-height: 70px; box-sizing: border-box; resize: vertical; }
+#tux-root .tux-ed-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
+#tux-root .tux-btn-primary { background: var(--tux-primary); color: #fff; border: none; border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+#tux-root .tux-btn-ghost { background: none; border: 1px solid var(--tux-border); color: var(--tux-muted); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+#tux-root .tux-btn-danger { background: none; border: 1px solid var(--tux-danger); color: var(--tux-danger); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+#tux-root .tux-x { background: none; border: none; color: var(--tux-muted); cursor: pointer; }
+
+#tux-root .tux-sidebar {
+  position: fixed; right: 0; top: 0; bottom: 0; z-index: 2147482999;
+  width: 300px; background: var(--tux-surface); border-left: 1px solid var(--tux-border);
+  box-shadow: var(--tux-shadow); transform: translateX(100%); transition: transform .18s ease;
+  display: flex; flex-direction: column;
+}
+#tux-root .tux-sidebar.tux-open { transform: translateX(0); }
+#tux-root .tux-sb-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; font-weight: 600; border-bottom: 1px solid var(--tux-border); }
+#tux-root .tux-sb-close { background: none; border: none; color: var(--tux-muted); cursor: pointer; }
+#tux-root .tux-sb-meta { padding: 8px 14px; font-size: 11px; color: var(--tux-muted); border-bottom: 1px solid var(--tux-border); }
+#tux-root .tux-sb-list { overflow: auto; flex: 1; padding: 8px; }
+#tux-root .tux-sb-item { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; padding: 8px; border-radius: 10px; background: var(--tux-surface2); margin-bottom: 8px; cursor: pointer; }
+#tux-root .tux-sb-item.tux-done { opacity: .55; }
+#tux-root .tux-sb-type { grid-row: span 2; align-self: center; font-size: 10px; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; background: var(--tux-yellow); }
+#tux-root .tux-type-approval { background: var(--tux-green); color: #fff; }
+#tux-root .tux-type-question { background: var(--tux-primary); color: #fff; }
+#tux-root .tux-type-issue { background: var(--tux-danger); color: #fff; }
+#tux-root .tux-sb-text { font-size: 12px; line-height: 1.4; word-break: break-word; }
+#tux-root .tux-sb-route { font-size: 10px; color: var(--tux-muted); }
+#tux-root .tux-sb-empty { color: var(--tux-muted); font-size: 12px; padding: 12px; }
+
+#tux-root .tux-toast {
+  position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(20px);
+  z-index: 2147483003; background: var(--tux-text); color: var(--tux-surface);
+  padding: 8px 16px; border-radius: 999px; font-size: 12px; opacity: 0;
+  transition: opacity .15s ease, transform .15s ease; pointer-events: none;
+}
+#tux-root .tux-toast.tux-visible { opacity: 1; transform: translateX(-50%) translateY(0); }

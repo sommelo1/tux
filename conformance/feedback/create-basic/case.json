@@ -1,0 +1,32 @@
+{
+  "args": [
+    "feedback",
+    "create",
+    "--type",
+    "change",
+    "--text",
+    "The primary CTA should be more prominent.",
+    "--route",
+    "/checkout/payment",
+    "--component",
+    "PaymentMethodCard",
+    "--component-instance",
+    "visa-ending-1234",
+    "--tux-id",
+    "payment-submit",
+    "--session",
+    "review_2026_08_28",
+    "--origin",
+    "design",
+    "--format",
+    "json"
+  ],
+  "env": {
+    "TUX_USER_ID": "usr_8f3a12",
+    "TUX_DISPLAY_NAME": "Lorenz",
+    "TUX_TIME_OVERRIDE": "2026-08-28T12:20:00Z"
+  },
+  "files": {
+    "tux.config.json": "{\n  \"project_id\": \"checkout-redesign\"\n}\n"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "args": [
+    "feedback",
+    "list",
+    "--format",
+    "json"
+  ],
+  "env": {}
+}

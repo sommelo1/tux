@@ -1,0 +1,6 @@
+exit 0
+{
+  "deleted": [
+    "fb_01J6F91H1J8KB0B0B0B0B0B0B0"
+  ]
+}

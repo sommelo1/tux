@@ -1,0 +1,2 @@
+exit 2
+error: --strategy is required in non-interactive mode (one of consolidate, requirements, tasks, direct, export-only)

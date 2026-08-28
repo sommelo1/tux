@@ -1,0 +1,11 @@
+{
+  "args": [
+    "feedback",
+    "create",
+    "--type",
+    "bogus",
+    "--text",
+    "x"
+  ],
+  "env": {}
+}

@@ -1,0 +1,16 @@
+{
+  "args": [
+    "feedback",
+    "incorporate",
+    "--strategy",
+    "tasks",
+    "--format",
+    "json"
+  ],
+  "env": {
+    "TUX_TIME_OVERRIDE": "2026-08-28T14:00:00Z"
+  },
+  "include": {
+    ".tux/feedback.json": "fixtures/store-incorporated-open.json"
+  }
+}

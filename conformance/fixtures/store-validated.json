@@ -1,0 +1,60 @@
+{
+  "schema_version": "1.0",
+  "project_id": "checkout-redesign",
+  "feedback": [
+    {
+      "schema_version": "1.0",
+      "id": "fb_01J6F91H1J8KD0D0D0D0D0D0D0",
+      "project_id": "checkout-redesign",
+      "session_id": "review_2026_08_28",
+      "author": {
+        "user_id": "usr_8f3a12",
+        "display_name": "Lorenz"
+      },
+      "origin": {
+        "mode": "design"
+      },
+      "location": {
+        "route": "/checkout"
+      },
+      "target": {
+        "tux_id": "cta"
+      },
+      "ui_state": {},
+      "feedback": {
+        "type": "change",
+        "text": "Make the CTA bigger."
+      },
+      "status": "incorporated",
+      "created_at": "2026-08-28T12:20:00.000Z",
+      "updated_at": "2026-08-28T12:20:00.000Z"
+    },
+    {
+      "schema_version": "1.0",
+      "id": "fb_01J6F91H1J8KF0F0F0F0F0F0F0",
+      "project_id": "checkout-redesign",
+      "session_id": "review_2026_08_28",
+      "author": {
+        "user_id": "usr_6c21bd",
+        "display_name": "Kim"
+      },
+      "origin": {
+        "mode": "design"
+      },
+      "location": {
+        "route": "/checkout"
+      },
+      "target": {
+        "tux_id": "totals"
+      },
+      "ui_state": {},
+      "feedback": {
+        "type": "approval",
+        "text": "Totals look good."
+      },
+      "status": "incorporated",
+      "created_at": "2026-08-28T12:22:00.000Z",
+      "updated_at": "2026-08-28T12:22:00.000Z"
+    }
+  ]
+}

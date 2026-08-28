@@ -1,0 +1,13 @@
+{
+  "args": [
+    "feedback",
+    "list",
+    "--mine"
+  ],
+  "env": {
+    "TUX_USER_ID": "usr_8f3a12"
+  },
+  "include": {
+    ".tux/feedback.json": "fixtures/store-three.json"
+  }
+}

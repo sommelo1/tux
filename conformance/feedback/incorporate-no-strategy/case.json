@@ -1,0 +1,10 @@
+{
+  "args": [
+    "feedback",
+    "incorporate"
+  ],
+  "env": {},
+  "include": {
+    ".tux/feedback.json": "fixtures/store-incorporated-open.json"
+  }
+}

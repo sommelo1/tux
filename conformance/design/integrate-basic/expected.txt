@@ -1,0 +1,12 @@
+exit 0
+{
+  "action": "integrate",
+  "kind": "design",
+  "framework": "vanilla",
+  "root": "requirements",
+  "config": "tux.config.json",
+  "next": [
+    "tux design create --framework vanilla",
+    "tux design serve"
+  ]
+}

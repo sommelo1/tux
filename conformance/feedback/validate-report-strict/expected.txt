@@ -1,0 +1,22 @@
+exit 1
+{
+  "schema_version": "1.0",
+  "summary": {
+    "total": 2,
+    "passed": 0,
+    "failed": 0,
+    "unvalidated": 2
+  },
+  "items": [
+    {
+      "id": "fb_01J6F91H1J8KD0D0D0D0D0D0D0",
+      "location_route": "/checkout",
+      "validation_result": "unvalidated"
+    },
+    {
+      "id": "fb_01J6F91H1J8KF0F0F0F0F0F0F0",
+      "location_route": "/checkout",
+      "validation_result": "unvalidated"
+    }
+  ]
+}

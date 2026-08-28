@@ -1,0 +1,18 @@
+{
+  "args": [
+    "feedback",
+    "validate",
+    "--record",
+    "fb_01J6F91H1J8KD0D0D0D0D0D0D0",
+    "--result",
+    "passed",
+    "--note",
+    "CTA is prominent now"
+  ],
+  "env": {
+    "TUX_TIME_OVERRIDE": "2026-08-28T15:00:00Z"
+  },
+  "include": {
+    ".tux/feedback.json": "fixtures/store-validated-open.json"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "args": [
+    "feedback",
+    "create",
+    "--type",
+    "issue",
+    "--text",
+    "Env wins"
+  ],
+  "env": {
+    "TUX_USER_ID": "usr_env01",
+    "TUX_DISPLAY_NAME": "Env User",
+    "TUX_TIME_OVERRIDE": "2026-08-28T12:20:00Z"
+  },
+  "files": {
+    "tux.config.json": "{\n  \"project_id\": \"p1\",\n  \"identity\": {\n    \"provider\": \"local\",\n    \"user_id\": \"usr_cfg01\",\n    \"display_name\": \"Config User\"\n  }\n}\n"
+  }
+}

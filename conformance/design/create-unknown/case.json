@@ -1,0 +1,11 @@
+{
+  "args": [
+    "design",
+    "create",
+    "--framework",
+    "svelte",
+    "--name",
+    "x"
+  ],
+  "env": {}
+}

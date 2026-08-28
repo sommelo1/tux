@@ -1,0 +1,10 @@
+{
+  "args": [
+    "feedback",
+    "list"
+  ],
+  "env": {},
+  "include": {
+    ".tux/feedback.json": "fixtures/store-three.json"
+  }
+}

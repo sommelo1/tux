@@ -1,0 +1,6 @@
+{
+  "project_id": "e2e-disabled",
+  "review": {
+    "enabled": false
+  }
+}

@@ -1,0 +1,8 @@
+# Byte-identical conformance fixtures, canonical JSON and skill sources
+# require LF everywhere — on every platform, in every checkout.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.woff2 binary
+*.ico binary

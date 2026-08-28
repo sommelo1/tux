@@ -1,0 +1,11 @@
+{
+  "args": [
+    "feedback",
+    "show",
+    "fb_01J6F91H1J8KA0A0A0A0A0A0A0"
+  ],
+  "env": {},
+  "include": {
+    ".tux/feedback.json": "fixtures/store-three.json"
+  }
+}

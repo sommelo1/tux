@@ -1,0 +1,15 @@
+{
+  "args": [
+    "feedback",
+    "update",
+    "fb_01J6F91H1J8KA0A0A0A0A0A0A0",
+    "--status",
+    "incorporated"
+  ],
+  "env": {
+    "TUX_TIME_OVERRIDE": "2026-08-28T13:00:00Z"
+  },
+  "include": {
+    ".tux/feedback.json": "fixtures/store-three.json"
+  }
+}

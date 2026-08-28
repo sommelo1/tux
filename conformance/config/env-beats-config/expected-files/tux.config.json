@@ -1,0 +1,8 @@
+{
+  "project_id": "p1",
+  "identity": {
+    "provider": "local",
+    "user_id": "usr_cfg01",
+    "display_name": "Config User"
+  }
+}

@@ -1,0 +1,4 @@
+exit 0
+fb_01J6F91H1J8KA0A0A0A0A0A0A0	open	change	/checkout/payment	The primary CTA should be more prominent.
+fb_01J6F91H1J8KB0B0B0B0B0B0B0	open	issue	/products	Price label overlaps the discount badge.
+fb_01J6F91H1J8KC0C0C0C0C0C0C0	resolved	question	/checkout/payment	Should the coupon field stay on this step?

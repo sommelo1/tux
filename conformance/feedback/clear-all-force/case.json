@@ -1,0 +1,14 @@
+{
+  "args": [
+    "feedback",
+    "clear",
+    "--all",
+    "--force",
+    "--format",
+    "json"
+  ],
+  "env": {},
+  "include": {
+    ".tux/feedback.json": "fixtures/store-three.json"
+  }
+}

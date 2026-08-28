@@ -1,0 +1,54 @@
+{
+  "name": "tux-uix",
+  "version": "0.1.0",
+  "description": "TUX - TUX UIX review system: attach structured, machine-readable feedback directly to running web UIs (pages, routes, components, elements, states) with a deterministic CLI, canonical JSON and LLM-friendly skills.",
+  "license": "MIT",
+  "author": {
+    "name": "Lorenz Sommer",
+    "url": "https://www.linkedin.com/in/sommerlorenz/"
+  },
+  "homepage": "https://github.com/sommelo1/tux#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sommelo1/tux.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sommelo1/tux/issues"
+  },
+  "type": "module",
+  "bin": {
+    "tux": "bin/tux.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./client/tux-review.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "client",
+    "skills",
+    "README.md"
+  ],
+  "keywords": [
+    "ui",
+    "ux",
+    "review",
+    "feedback",
+    "clickable-design",
+    "llm",
+    "ai",
+    "agents"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node test/conformance.test.js && node --test test/api.test.js && node --test test/review.test.js && node test/skills.test.js",
+    "test:watch": "node --watch-path=../conformance test/conformance.test.js",
+    "e2e": "node e2e/run.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.62.1"
+  }
+}

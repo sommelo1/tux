@@ -1,0 +1,13 @@
+{
+  "args": [
+    "feedback",
+    "delete",
+    "fb_01J6F91H1J8KB0B0B0B0B0B0B0",
+    "--format",
+    "json"
+  ],
+  "env": {},
+  "include": {
+    ".tux/feedback.json": "fixtures/store-three.json"
+  }
+}

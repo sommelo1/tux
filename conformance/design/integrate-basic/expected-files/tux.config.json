@@ -1,0 +1,19 @@
+{
+  "project_id": "work",
+  "design": {
+    "root": "requirements",
+    "framework": "vanilla"
+  },
+  "review": {
+    "enabled": true,
+    "store": ".tux/feedback.json",
+    "host": "127.0.0.1",
+    "port": 4173
+  },
+  "identity": {
+    "provider": "local",
+    "user_id": "anonymous",
+    "display_name": "Anonymous",
+    "admins": []
+  }
+}
