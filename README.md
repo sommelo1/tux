@@ -14,20 +14,56 @@ and UI states — while humans, CLI tools, scripts, and LLM agents all work
 with the same canonical data. No Figma, no annotation boards, no copy-paste
 of comments into tickets.
 
+TUX covers **two distinct use cases** — a clickable design world and a live
+application world. Both attach structured, machine-readable feedback to the
+running UI and share one canonical feedback core (one store, one vocabulary);
+they differ in what is reviewed and how the Review Client reaches it.
+
+### Use case 1 — Design review (clickable mockup)
+
+For requirements and design work: screens become runnable, clickable designs
+(vanilla, react, vue, angular). TUX is installed into the design environment,
+the design is served with the Review Client, and feedback carries
+`origin: design`. Incorporation updates the design itself; validation
+verifies every change in the running mockup.
+
 ```mermaid
 flowchart TD
-    REQ["Requirements"] --> DC["Clickable design<br>tux design create"]
-    APP["Existing application"] --> LI["Running application<br>tux live install"]
+    REQ["Requirements"] --> DI["tux design install<br>config + review wiring"]
+    DI --> DC["tux design create<br>clickable design (vanilla · react · vue · angular)"]
     DC --> DS["tux design start-review<br>design server + Review Client"]
-    LI --> LS["tux live start-review<br>proxy + Review Client"]
     DS -- "origin: design" --> FB["Structured feedback<br>canonical JSON · canonical store"]
-    LS -- "origin: live" --> FB
     FB --> INC["tux feedback incorporate<br>group · deduplicate · conflicts · traceability"]
-    INC --> IMPL["Changes implemented"]
-    IMPL --> VAL["tux feedback validate<br>verified in the running UI"]
+    INC --> UPD["Design updated"]
+    UPD --> VAL["tux feedback validate<br>verified in the running design"]
     VAL -. "next design cycle" .-> DS
+```
+
+### Use case 2 — Live review (running application)
+
+For real applications in development, test, staging, or review environments:
+TUX reaches the app without build changes — `tux live install` selects the
+least-invasive strategy (reverse-proxy injection by default) and
+`tux live start-review --url …` attaches the Review Client through the
+proxy. Feedback carries `origin: live`; incorporation drives implementation
+in the application's own codebase, and validation verifies against the
+running app.
+
+```mermaid
+flowchart TD
+    APP["Existing application<br>(dev · test · staging · review)"] --> LI["tux live install<br>least-invasive strategy (proxy injection by default)"]
+    LI --> LS["tux live start-review --url …<br>proxy + Review Client"]
+    LS -- "origin: live" --> FB["Structured feedback<br>canonical JSON · canonical store"]
+    FB --> INC["tux feedback incorporate<br>group · deduplicate · conflicts · traceability"]
+    INC --> IMPL["Implementation in the application"]
+    IMPL --> VAL["tux feedback validate<br>verified against the running app"]
     VAL -. "next live cycle" .-> LS
 ```
+
+Both cycles use the same feedback verbs — `tux feedback show`, `export`,
+`incorporate`, `validate` — scoped with `--origin design|live`, and write
+into the same canonical store. Stopping a review server never deletes
+feedback.
 
 ## Contents
 
