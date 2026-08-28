@@ -16,16 +16,17 @@ of comments into tickets.
 
 ```mermaid
 flowchart TD
-    REQ["Requirements"]
-    UI["Clickable Design / Working Application"]
-    REVIEW["Human Review directly in the UI<br>TUX Review Client (overlay)"]
-    FB["Structured Feedback<br>canonical JSON, versioned schema"]
-    AGENT["LLM / Agent Processing<br>tux feedback incorporate (Skill)"]
-    UPDATED["Updated UI"]
-    VALID["Validation<br>tux feedback validate"]
-
-    REQ --> UI --> REVIEW --> FB --> AGENT --> UPDATED --> VALID
-    VALID -. "next review cycle" .-> REVIEW
+    REQ["Requirements"] --> DC["Clickable design<br>tux design create"]
+    APP["Existing application"] --> LI["Running application<br>tux live install"]
+    DC --> DS["tux design start-review<br>design server + Review Client"]
+    LI --> LS["tux live start-review<br>proxy + Review Client"]
+    DS -- "origin: design" --> FB["Structured feedback<br>canonical JSON · canonical store"]
+    LS -- "origin: live" --> FB
+    FB --> INC["tux feedback incorporate<br>group · deduplicate · conflicts · traceability"]
+    INC --> IMPL["Changes implemented"]
+    IMPL --> VAL["tux feedback validate<br>verified in the running UI"]
+    VAL -. "next design cycle" .-> DS
+    VAL -. "next live cycle" .-> LS
 ```
 
 ## Contents
