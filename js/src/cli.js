@@ -8,12 +8,10 @@
  * @module cli
  */
 import { CliError, EXIT } from './errors.js';
-import { loadConfig, resolveIdentity } from './config.js';
-import { nowMs } from './ids.js';
+import { loadConfig } from './config.js';
 import { opList, opShow, opCreate, opUpdate, opDelete, opClear, opExport, opIncorporate, opValidate } from './feedback.js';
-import { opDesignIntegrate, opDesignCreate } from './design.js';
-import { opReviewIntegrate, opReviewStart, opReviewStatus, opReviewStop } from './review.js';
-import { startServer } from './server.js';
+import { opDesignInstall, opDesignCreate, opLiveCreate, opDesignStart, opDesignStatus, opDesignStop } from './design.js';
+import { opLiveInstall, opLiveStart, opLiveStatus, opLiveStop } from './live.js';
 
 export const VERSION = '0.1.0';
 
@@ -88,10 +86,6 @@ export async function run(argv, context = {}) {
     const domain = positional[0];
     const action = positional[1];
 
-    if (domain === '_serve') {
-      return await serveHidden(cwd, flags, positional);
-    }
-
     if (domain === 'feedback') {
       const { config, configPath } = loadConfig(cwd, flags);
       const opts = optsFrom(cwd, config, configPath, flags);
@@ -101,7 +95,7 @@ export async function run(argv, context = {}) {
           opts.format = flags.format ?? 'text';
           return opList(opts, {
             status: flags.status, type: flags.type, mine: flags.mine ?? false,
-            route: flags.route, session: flags.session,
+            route: flags.route, session: flags.session, origin: flags.origin,
           });
         case 'show': {
           const id = positional[2];
@@ -142,7 +136,7 @@ export async function run(argv, context = {}) {
           return opExport(opts, flags.format === 'jsonl' ? 'jsonl' : 'json');
         case 'incorporate':
           return opIncorporate(opts, flags.strategy, {
-            mine: flags.mine ?? false, route: flags.route, session: flags.session,
+            mine: flags.mine ?? false, route: flags.route, session: flags.session, origin: flags.origin,
           });
         case 'validate':
           return opValidate(opts, {
@@ -150,58 +144,58 @@ export async function run(argv, context = {}) {
             result: flags.result,
             note: flags.note,
             strict: flags.strict ?? false,
+            origin: flags.origin,
           });
         default:
           throw new CliError(EXIT.usage, `unknown action: ${action ?? '(missing)'} for domain ${domain}`);
       }
     }
 
-    if (domain === 'design') {
+    if (domain === 'design' || domain === 'live') {
       const { config, configPath } = loadConfig(cwd, flags);
       const opts = optsFrom(cwd, config, configPath, flags);
+      const isDesign = domain === 'design';
       opts.format = requireFormat(flags, 'json');
       switch (action) {
-        case 'integrate':
-          return opDesignIntegrate(opts, { framework: flags.framework, root: flags.root });
+        case 'install':
+          return isDesign
+            ? opDesignInstall(opts, { framework: flags.framework, root: flags.root })
+            : opLiveInstall(opts);
         case 'create':
-          return opDesignCreate(opts, { framework: flags.framework, name: flags.name });
-        case 'serve': {
-          const root = flags.dir ?? config.design.root;
-          return serveForeground({ cwd, config, flags: { ...flags, dir: root }, mode: 'design' });
-        }
-        default:
-          throw new CliError(EXIT.usage, `unknown action: ${action ?? '(missing)'} for domain ${domain}`);
-      }
-    }
-
-    if (domain === 'review') {
-      const { config, configPath } = loadConfig(cwd, flags);
-      const opts = optsFrom(cwd, config, configPath, flags);
-      switch (action) {
-        case 'integrate':
+          return isDesign
+            ? opDesignCreate(opts, { framework: flags.framework, name: flags.name })
+            : opLiveCreate(opts, { framework: flags.framework, name: flags.name });
+        case 'start-review':
           opts.format = flags.format ?? 'json';
-          return opReviewIntegrate(opts);
-        case 'start': {
-          const cmd = parsed.cmd && parsed.cmd.length ? parsed.cmd.join(' ') : (positional.length > 2 ? positional.slice(2).join(' ') : null);
-          opts.format = flags.format ?? 'json';
-          return await opReviewStart(opts, {
+          if (isDesign) {
+            return await opDesignStart(opts, {
+              dir: flags.dir,
+              port: flags.port ? Number(flags.port) : undefined,
+              host: flags.host,
+              session: flags.session,
+              environment: flags.environment,
+              dryRun: flags['dry-run'] ?? false,
+              foreground: flags.foreground ?? false,
+            });
+          }
+          return await opLiveStart(opts, {
             url: flags.url ?? null,
-            cmd,
+            cmd: parsed.cmd && parsed.cmd.length ? parsed.cmd.join(' ') : (positional.length > 2 ? positional.slice(2).join(' ') : null),
             targetPort: flags['target-port'] ? Number(flags['target-port']) : undefined,
             port: flags.port ? Number(flags.port) : undefined,
             host: flags.host,
             session: flags.session,
             environment: flags.environment,
             dryRun: flags['dry-run'] ?? false,
+            foreground: flags.foreground ?? false,
           });
-        }
         case 'status': {
           opts.format = flags.format ?? 'text';
-          return await opReviewStatus(opts);
+          return await opLiveStatus(opts);
         }
         case 'stop': {
           opts.format = flags.format ?? 'text';
-          return opReviewStop(opts);
+          return opLiveStop(opts);
         }
         default:
           throw new CliError(EXIT.usage, `unknown action: ${action ?? '(missing)'} for domain ${domain}`);
@@ -215,47 +209,6 @@ export async function run(argv, context = {}) {
   }
 }
 
-async function serveHidden(cwd, flags) {
-  const { config } = loadConfig(cwd, flags);
-  const server = startServer({
-    mode: flags.mode ?? 'design',
-    host: flags.host ?? config.review.host,
-    port: Number(flags.port ?? config.review.port),
-    root: flags.root ?? null,
-    target: flags.target ?? null,
-    cwd,
-    session: flags.session ?? 'default',
-    environment: flags.environment ?? (flags.mode === 'design' ? 'design' : 'development'),
-    config,
-  });
-  await new Promise((resolvePromise) => server.listen(Number(flags.port ?? config.review.port), flags.host ?? config.review.host, resolvePromise));
-  return { stdout: '', exit: EXIT.ok, keepAlive: server };
-}
-
-function serveForeground({ cwd, config, flags, mode }) {
-  const root = flags.dir ?? config.design.root;
-  const host = flags.host ?? config.review.host;
-  const port = Number(flags.port ?? config.review.port);
-  const session = flags.session ?? 'default';
-  const server = startServer({
-    mode,
-    host,
-    port,
-    root,
-    target: null,
-    cwd,
-    session,
-    environment: mode === 'design' ? 'design' : 'development',
-    config,
-  });
-  server.listen(port, host);
-  return {
-    stdout: `serving ${mode} at http://${host}:${port} (Ctrl+C to stop)\n`,
-    exit: EXIT.ok,
-    keepAlive: server,
-  };
-}
-
 function fail(e) {
   return { stdout: '', stderr: `error: ${e.message}\n`, exit: e.code };
 }
@@ -265,8 +218,8 @@ function help() {
     'tux <domain> <action> [arguments] [options]',
     '',
     'domains:',
-    '  design    integrate | create | serve',
-    '  review    integrate | start | status | stop',
+    '  design    install | create | start-review | status | stop',
+    '  live      install | create | start-review | status | stop',
     '  feedback  list | show | create | update | delete | clear | export | incorporate | validate',
     '',
     'options:',

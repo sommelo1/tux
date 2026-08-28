@@ -14,7 +14,7 @@ def _read(p: Path) -> bytes:
 
 def test_seven_canonical_skills_exist():
     sources = sorted(p.name for p in SKILLS.glob("*.md"))
-    assert len(sources) == 7, f"expected 7 canonical skills, found {sources}"
+    assert len(sources) == 12, f"expected 12 canonical skills, found {sources}"
 
 
 def test_skill_sources_follow_contract():

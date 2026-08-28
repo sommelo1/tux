@@ -13,8 +13,8 @@ const repo = join(jsRoot, '..');
 const example = join(repo, 'examples', 'design-vanilla');
 
 const servers = [
-  { args: [join(jsRoot, 'bin', 'tux.js'), 'design', 'serve', '--dir', '.', '--port', '4181'], cwd: example, url: 'http://127.0.0.1:4181/api/tux/health' },
-  { args: [join(jsRoot, 'bin', 'tux.js'), 'design', 'serve', '--dir', '.', '--port', '4182', '--config', join(jsRoot, 'e2e', 'fixtures', 'config-disabled.json')], cwd: example, url: 'http://127.0.0.1:4182/api/tux/health' },
+  { args: [join(jsRoot, 'bin', 'tux.js'), 'design', 'start-review', '--dir', '.', '--foreground', '--port', '4181'], cwd: example, url: 'http://127.0.0.1:4181/api/tux/health' },
+  { args: [join(jsRoot, 'bin', 'tux.js'), 'design', 'start-review', '--dir', '.', '--foreground', '--port', '4182', '--config', join(jsRoot, 'e2e', 'fixtures', 'config-disabled.json')], cwd: example, url: 'http://127.0.0.1:4182/api/tux/health' },
   { args: [join(jsRoot, 'e2e', 'helpers', 'static-server.mjs'), '4183'], cwd: jsRoot, url: 'http://127.0.0.1:4183/' },
 ];
 

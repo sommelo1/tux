@@ -143,7 +143,7 @@ def _api(state, handler, method, path, query):
             "project_id": store["project_id"],
             "session_id": session,
             "author": identity,
-            "origin": "design" if state.mode == "design" else "review",
+            "origin": "design" if state.mode == "design" else "live",
             "location": data.get("location") or {},
             "target": data.get("target") or {},
             "ui_state": data.get("ui_state") or {},

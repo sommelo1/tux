@@ -35,6 +35,7 @@ export function opList(opts, filters) {
   if (filters.mine) items = items.filter((f) => f.author.user_id === c.identity.user_id);
   if (filters.route) items = items.filter((f) => f.location?.route === filters.route);
   if (filters.session) items = items.filter((f) => f.session_id === filters.session);
+  if (filters.origin) items = items.filter((f) => f.origin?.mode === filters.origin);
   if (c.format === 'json') return { stdout: canonicalJson(items) + '\n', exit: EXIT.ok };
   const lines = items.map((f) =>
     [f.id, f.status, f.feedback.type, f.location?.route ?? '-', firstLine(f.feedback.text)].join('\t')
@@ -179,6 +180,7 @@ export function opIncorporate(opts, strategy, filters) {
   if (filters.mine) open = open.filter((f) => f.author.user_id === c.identity.user_id);
   if (filters.route) open = open.filter((f) => f.location?.route === filters.route);
   if (filters.session) open = open.filter((f) => f.session_id === filters.session);
+  if (filters.origin) open = open.filter((f) => f.origin?.mode === filters.origin);
 
   const groups = [];
   const byKey = new Map();
@@ -257,8 +259,9 @@ export function opValidate(opts, args) {
     return { stdout: canonicalJson(item) + '\n', exit: EXIT.ok };
   }
   const store = loadStore(c.cwd, c.config);
-  const items = store.feedback
+  let items = store.feedback
     .filter((f) => f.status === 'incorporated')
+    .filter((f) => !args.origin || f.origin?.mode === args.origin)
     .map((f) => ({
       id: f.id,
       location_route: f.location?.route ?? null,

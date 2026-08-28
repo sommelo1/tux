@@ -1,0 +1,12 @@
+exit 0
+{
+  "action": "start",
+  "kind": "live",
+  "mode": "proxy",
+  "target": "http://localhost:3000",
+  "host": "127.0.0.1",
+  "port": 4173,
+  "session_id": "default",
+  "environment": "live",
+  "url": "http://127.0.0.1:4173"
+}

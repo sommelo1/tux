@@ -1,0 +1,9 @@
+{
+  "args": [
+    "design",
+    "status",
+    "--format",
+    "json"
+  ],
+  "env": {}
+}

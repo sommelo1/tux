@@ -9,7 +9,7 @@ export const SCHEMA_VERSION = '1.0';
 
 export const FEEDBACK_TYPES = ['change', 'issue', 'question', 'approval'];
 export const FEEDBACK_STATUSES = ['open', 'incorporated', 'resolved', 'rejected'];
-export const ORIGIN_MODES = ['design', 'review'];
+export const ORIGIN_MODES = ['design', 'live'];
 
 /**
  * Validate a feedback item. Returns a list of problems; empty means valid.

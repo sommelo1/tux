@@ -1,0 +1,12 @@
+exit 0
+{
+  "action": "start",
+  "kind": "design",
+  "mode": "design",
+  "root": "requirements",
+  "host": "127.0.0.1",
+  "port": 4173,
+  "session_id": "default",
+  "environment": "design",
+  "url": "http://127.0.0.1:4173"
+}

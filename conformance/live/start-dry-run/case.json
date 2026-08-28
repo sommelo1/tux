@@ -1,0 +1,15 @@
+{
+  "args": [
+    "live",
+    "start-review",
+    "--url",
+    "http://localhost:3000",
+    "--dry-run",
+    "--format",
+    "json"
+  ],
+  "env": {
+    "TUX_TIME_OVERRIDE": "2026-08-28T12:00:00Z"
+  },
+  "files": {}
+}

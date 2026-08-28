@@ -1,0 +1,9 @@
+{
+  "args": [
+    "live",
+    "status",
+    "--format",
+    "json"
+  ],
+  "env": {}
+}

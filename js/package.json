@@ -45,7 +45,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "node test/conformance.test.js && node --test test/api.test.js && node --test test/review.test.js && node test/skills.test.js",
+    "test": "node test/conformance.test.js && node --test test/api.test.js && node --test test/live.test.js && node test/skills.test.js",
     "test:watch": "node --watch-path=../conformance test/conformance.test.js",
     "e2e": "node e2e/run.mjs",
     "package:js": "node ../tools/package-js.mjs",

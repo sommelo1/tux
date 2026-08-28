@@ -43,6 +43,8 @@ def op_list(opts: dict, filters: dict) -> dict:
         items = [f for f in items if (f.get("location") or {}).get("route") == filters["route"]]
     if filters.get("session"):
         items = [f for f in items if f["session_id"] == filters["session"]]
+    if filters.get("origin"):
+        items = [f for f in items if f["origin"]["mode"] == filters["origin"]]
     if c["format"] == "json":
         return {"stdout": canonical_json(items) + "\n", "exit": Exit.OK}
     lines = [
@@ -205,6 +207,8 @@ def op_incorporate(opts: dict, strategy: str | None, filters: dict) -> dict:
         open_items = [f for f in open_items if (f.get("location") or {}).get("route") == filters["route"]]
     if filters.get("session"):
         open_items = [f for f in open_items if f["session_id"] == filters["session"]]
+    if filters.get("origin"):
+        open_items = [f for f in open_items if f["origin"]["mode"] == filters["origin"]]
 
     groups: list[dict] = []
     by_key: dict[str, dict] = {}
@@ -283,7 +287,8 @@ def op_validate(opts: dict, args: dict) -> dict:
         {"id": f["id"],
          "location_route": (f.get("location") or {}).get("route"),
          "validation_result": (f.get("validation") or {}).get("result") or "unvalidated"}
-        for f in store["feedback"] if f["status"] == "incorporated"
+        for f in store["feedback"]
+        if f["status"] == "incorporated" and (not args.get("origin") or f["origin"]["mode"] == args["origin"])
     ]
     summary = {
         "total": len(items),

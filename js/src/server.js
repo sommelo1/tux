@@ -4,7 +4,7 @@
  * Two modes:
  * - `design`: serves a static design directory from disk, injecting the
  *   Review Client into every HTML response.
- * - `review`: reverse-proxies an existing application, injecting the
+ * - `live`: reverse-proxies an existing application, injecting the
  *   Review Client into HTML responses on the way through.
  *
  * Endpoints (canonical API):
@@ -52,11 +52,11 @@ const MIME = {
 
 /**
  * @param {object} opts
- * @param {'design'|'review'} opts.mode
+ * @param {'design'|'live'} opts.mode
  * @param {string} opts.host bind host
  * @param {number} opts.port bind port
  * @param {string|null} opts.root static root (design mode)
- * @param {string|null} opts.target proxy target (review mode)
+ * @param {string|null} opts.target proxy target (live mode)
  * @param {string} opts.cwd project cwd for store access
  * @param {object} opts.config resolved project config
  * @param {string} opts.session session id exposed to clients
@@ -147,7 +147,7 @@ async function api(state, req, res, url) {
       project_id: store.project_id,
       session_id: session,
       author: identity,
-      origin: state.mode === 'design' ? 'design' : 'review',
+      origin: state.mode === 'design' ? 'design' : 'live',
       location: data.location ?? {},
       target: data.target ?? {},
       ui_state: data.ui_state ?? {},
@@ -159,7 +159,6 @@ async function api(state, req, res, url) {
     saveStore(state.cwd, state.config, store);
     return sendJson(res, 201, item);
   }
-
   if (path === '/api/tux/feedback/clear' && method === 'POST') {
     const body = await readJson(req);
     if (body.error) return sendJson(res, 400, { error: { code: 'invalid', message: body.error } });

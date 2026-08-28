@@ -1,9 +1,0 @@
-{
-  "args": [
-    "review",
-    "status",
-    "--format",
-    "json"
-  ],
-  "env": {}
-}

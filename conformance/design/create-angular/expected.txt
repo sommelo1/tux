@@ -6,7 +6,7 @@ exit 0
   "name": "checkout",
   "root": "requirements/checkout/design",
   "next": [
-    "tux design serve",
+    "tux design start-review",
     "review in the browser"
   ]
 }

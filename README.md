@@ -44,13 +44,13 @@ Next Review Cycle
 
 ```bash
 # Node (npm) — CLI without global installs
-npx --yes --package=tux-uix tux design integrate --framework vanilla
+npx --yes --package=tux-uix tux design install --framework vanilla
 npx --yes --package=tux-uix tux design create --framework vanilla --name checkout
-npx --yes --package=tux-uix tux design serve            # → http://127.0.0.1:4173
+npx --yes --package=tux-uix tux design start-review # → http://127.0.0.1:4173
 
 # Python (PyPI)
 pipx install tux-uix
-tux review start --url http://localhost:3000            # proxy with live review
+tux live start-review --url http://localhost:3000      # proxy with live review
 ```
 
 Review in the browser: click the ⬢ launcher (or press `Alt+T`), pick any
@@ -65,8 +65,8 @@ tux feedback validate --record fb_01M14502C04SWVHV231VZHZ4D6 --result passed --n
 ## CLI surface
 
 ```text
-tux design    integrate | create | serve
-tux review    integrate | start | status | stop
+tux design    install | create | start-review | status | stop
+tux live      install | create | start-review | status | stop
 tux feedback  list | show | create | update | delete | clear | export | incorporate | validate
 ```
 

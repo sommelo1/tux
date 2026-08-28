@@ -190,13 +190,13 @@ Example:
 
 CLI:
 
-tux design integrate
+tux design install
 
 
 
 Skill:
 
-tux-design-integrate
+tux-design-install
 
 ```
 
@@ -206,13 +206,13 @@ tux-design-integrate
 
 CLI:
 
-tux feedback incorporate
+tux feedback export
 
 
 
 Skill:
 
-tux-feedback-incorporate
+tux-feedback-export
 
 ```
 
@@ -240,11 +240,11 @@ Initial canonical TUX domains are:
 
 ```text
 
-tux design
+tux design$1tux live$2tux feedback
 
-tux review
+tux design$1tux live$2tux feedback
 
-tux feedback
+tux design$1tux live$2tux feedback
 
 ```
 
@@ -1354,7 +1354,7 @@ Live review:
 
 &#x20; "origin": {
 
-&#x20;   "mode": "review"
+&#x20;   "mode": "live"
 
 &#x20; }
 
@@ -1738,19 +1738,25 @@ tux
 
 ├── design
 
-│   ├── integrate
+│   ├── install
 
 │   ├── create
 
-│   └── serve
+│   ├── start-review
+
+│   ├── status
+
+│   └── stop
 
 │
 
-├── review
+├── live
 
-│   ├── integrate
+│   ├── install
 
-│   ├── start
+│   ├── create
+
+│   ├── start-review
 
 │   ├── status
 
@@ -1796,23 +1802,25 @@ The corresponding canonical Skills are:
 
 ```text
 
-tux-design-integrate
+tux-design-install
 
 tux-design-create
 
-tux-design-serve
+tux-design-start-review
 
 
 
-tux-review-integrate
+tux-live-install
 
-tux-review-start
+tux-live-create
+
+tux-live-start-review
 
 
 
-tux-feedback-incorporate
+tux-design-incorporate
 
-tux-feedback-validate
+tux-live-incorporate
 
 ```
 
@@ -1828,9 +1836,9 @@ For example, a dedicated Skill is not necessarily required for:
 
 ```text
 
-tux feedback show
+tux live status
 
-tux feedback delete
+tux feedback clear
 
 ```
 
@@ -1892,9 +1900,9 @@ Selection mapping:
 
 Design
 
-→ tux design integrate
+→ tux design install
 
-→ tux-design-integrate
+→ tux-design-install
 
 ```
 
@@ -1904,9 +1912,9 @@ Design
 
 Live review
 
-→ tux review integrate
+→ tux live install
 
-→ tux-review-integrate
+→ tux-live-install
 
 ```
 
@@ -1916,9 +1924,9 @@ Live review
 
 Both
 
-→ tux design integrate
+→ tux design install
 
-→ tux review integrate
+→ tux live install
 
 ```
 
@@ -1932,7 +1940,7 @@ No additional integration abstraction is required.
 
 
 
-\# 28. `tux design integrate`
+\# 28. `tux design install`
 
 
 
@@ -1942,7 +1950,7 @@ Canonical CLI:
 
 ```bash
 
-tux design integrate
+tux design install
 
 ```
 
@@ -1954,7 +1962,7 @@ Canonical Skill:
 
 ```text
 
-tux-design-integrate
+tux-design-install
 
 ```
 
@@ -2010,7 +2018,7 @@ The integration must determine:
 
 
 
-`tux design integrate` shall establish:
+`tux design install` shall establish:
 
 
 
@@ -2072,7 +2080,7 @@ Integration is successful only if a reviewer can:
 
 
 
-\# 32. `tux review integrate`
+\# 32. `tux live install`
 
 
 
@@ -2082,7 +2090,7 @@ Canonical CLI:
 
 ```bash
 
-tux review integrate
+tux live install
 
 ```
 
@@ -2094,7 +2102,7 @@ Canonical Skill:
 
 ```text
 
-tux-review-integrate
+tux-live-install
 
 ```
 
@@ -2111,6 +2119,10 @@ Integrate TUX into an existing runnable web application.
 \---
 
 
+
+`tux live create` scaffolds a runnable live application (vanilla, react, vue or angular) using the same templates as `tux design create`. The artifact is identical; the report declares `"kind": "live"` and the next steps reference `tux live install` and `tux live start-review`. Feedback gathered from it carries `"origin": "live"`.
+
+\---
 
 \# 33. Review Integration Discovery
 
@@ -2416,7 +2428,7 @@ verify
 
 
 
-\# 38. `tux design serve`
+\# 38. `tux design start-review`
 
 
 
@@ -2426,7 +2438,7 @@ CLI:
 
 ```bash
 
-tux design serve
+tux design start-review
 
 ```
 
@@ -2438,7 +2450,7 @@ Skill where needed:
 
 ```text
 
-tux-design-serve
+tux-design-start-review
 
 ```
 
@@ -2458,7 +2470,7 @@ Examples:
 
 ```bash
 
-tux design serve --port 4173
+tux design start-review --port 4173
 
 ```
 
@@ -2466,7 +2478,7 @@ tux design serve --port 4173
 
 ```bash
 
-tux design serve --session checkout-review
+tux design start-review --session checkout-review
 
 ```
 
@@ -2476,7 +2488,11 @@ tux design serve --session checkout-review
 
 
 
-\# 39. `tux review start`
+`tux design start-review` starts the design server detached, writes the server state file and returns. `tux design status` and `tux design stop` manage that state with the same semantics as `tux live status` and `tux live stop`; `--foreground` keeps the blocking behavior.
+
+\---
+
+\# 39. `tux live start-review`
 
 
 
@@ -2486,7 +2502,7 @@ CLI:
 
 ```bash
 
-tux review start
+tux live start-review
 
 ```
 
@@ -2498,7 +2514,7 @@ Skill:
 
 ```text
 
-tux-review-start
+tux-live-start-review
 
 ```
 
@@ -2518,7 +2534,7 @@ Examples:
 
 ```bash
 
-tux review start --url http://localhost:3000
+tux live start-review --url http://localhost:3000
 
 ```
 
@@ -2530,7 +2546,7 @@ or:
 
 ```bash
 
-tux review start -- npm run dev
+tux live start-review -- npm run dev
 
 ```
 
@@ -2540,13 +2556,13 @@ tux review start -- npm run dev
 
 
 
-\# 40. `tux review status`
+\# 40. `tux live status`
 
 
 
 ```bash
 
-tux review status
+tux live status
 
 ```
 
@@ -2576,13 +2592,13 @@ Returns information including:
 
 
 
-\# 41. `tux review stop`
+\# 41. `tux live stop`
 
 
 
 ```bash
 
-tux review stop
+tux live stop
 
 ```
 
@@ -2948,7 +2964,7 @@ Skill:
 
 ```text
 
-tux-feedback-incorporate
+tux-design-incorporate
 
 ```
 
@@ -3288,7 +3304,7 @@ Skill:
 
 ```text
 
-tux-feedback-validate
+tux-live-incorporate
 
 ```
 
@@ -4304,9 +4320,9 @@ Then:
 
 1
 
-→ tux design integrate
+→ tux design install
 
-→ tux-design-integrate
+→ tux-design-install
 
 ```
 
@@ -4316,9 +4332,9 @@ Then:
 
 2
 
-→ tux review integrate
+→ tux live install
 
-→ tux-review-integrate
+→ tux-live-install
 
 ```
 
@@ -4342,7 +4358,7 @@ There is no global `tux-integrate` Skill.
 
 
 
-\# 79. Skill: `tux-design-integrate`
+\# 79. Skill: `tux-design-install`
 
 
 
@@ -4418,7 +4434,7 @@ accept
 
 
 
-\# 80. Skill: `tux-review-integrate`
+\# 80. Skill: `tux-live-install`
 
 
 
@@ -4562,7 +4578,7 @@ verify review capability
 
 
 
-\# 82. Skill: `tux-review-start`
+\# 82. Skill: `tux-live-start-review`
 
 
 
@@ -4594,7 +4610,7 @@ It should:
 
 
 
-\# 83. Skill: `tux-feedback-incorporate`
+\# 83. Skill: `tux-design-incorporate`
 
 
 
@@ -4650,7 +4666,7 @@ record traceability
 
 
 
-\# 84. Skill: `tux-feedback-validate`
+\# 84. Skill: `tux-live-incorporate`
 
 
 
@@ -5032,7 +5048,7 @@ Run:
 
 tux design create --framework react
 
-tux design serve
+tux design start-review
 
 ```
 
@@ -5094,7 +5110,7 @@ Run:
 
 ```bash
 
-tux review start -- npm run dev
+tux live start-review -- npm run dev
 
 ```
 
@@ -5210,7 +5226,7 @@ tux feedback list --status open --format json
 
 
 
-Then the `tux-feedback-incorporate` Skill:
+Then the `tux-design-incorporate` Skill:
 
 
 
@@ -5254,7 +5270,7 @@ tux feedback validate
 
 
 
-or the `tux-feedback-validate` Skill verifies:
+or the `tux-live-incorporate` Skill verifies:
 
 
 
@@ -5314,19 +5330,19 @@ Initial MVP should provide:
 
 14\. SQLite persistence;
 
-15\. `tux design integrate`;
+15\. `tux design install`;
 
 16\. `tux design create`;
 
-17\. `tux design serve`;
+17\. `tux design start-review`;
 
-18\. `tux review integrate`;
+18\. `tux live install`;
 
-19\. `tux review start`;
+19\. `tux live start-review`;
 
-20\. `tux review status`;
+20\. `tux live status`;
 
-21\. `tux review stop`;
+21\. `tux live stop`;
 
 22\. `tux feedback list`;
 
@@ -5350,19 +5366,33 @@ Initial MVP should provide:
 
 32\. build-time exclusion;
 
-33\. `tux-design-integrate`;
+33\. `tux-design-install`;
 
-34\. `tux-review-integrate`;
+34\. `tux-live-install`;
 
 35\. `tux-design-create`;
 
-36\. `tux-feedback-incorporate`;
+36\. `tux-design-incorporate`;
 
-37\. `tux-feedback-validate`;
+37\. `tux-live-incorporate`;
 
-38\. integration test contracts;
+38\. `tux live create`;
 
-39\. acceptance verification.
+39\. `tux design status`;
+
+40\. `tux design stop`;
+
+41\. `tux-feedback-list`;
+
+42\. `tux-feedback-show`;
+
+43\. `tux-feedback-delete`;
+
+44\. `tux-feedback-export`;
+
+45\. integration test contracts;
+
+46\. acceptance verification.
 
 
 
@@ -5512,17 +5542,17 @@ tux-<domain>-<action>
 
 Design
 
-→ tux design integrate
+→ tux design install
 
-→ tux-design-integrate
+→ tux-design-install
 
 
 
 Live Review
 
-→ tux review integrate
+→ tux live install
 
-→ tux-review-integrate
+→ tux-live-install
 
 ```
 

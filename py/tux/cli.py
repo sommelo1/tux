@@ -12,8 +12,8 @@ from .errors import CliError, Exit
 from .feedback import (op_clear, op_create, op_delete, op_export,
                        op_incorporate, op_list, op_show, op_update,
                        op_validate)
-from .design import op_design_create, op_design_integrate
-from .review import op_review_integrate, op_review_start, op_review_status, op_review_stop
+from .design import op_design_create, op_design_install, op_design_start, op_design_status, op_design_stop, op_live_create
+from .live import op_live_install, op_live_start, op_live_status, op_live_stop
 
 VERSION = "0.1.0"
 
@@ -82,7 +82,7 @@ def run(argv: list[str], context: dict | None = None) -> dict:
                 return _ok(op_list(opts, {
                     "status": flags.get("status"), "type": flags.get("type"),
                     "mine": bool(flags.get("mine")), "route": flags.get("route"),
-                    "session": flags.get("session"),
+                    "session": flags.get("session"), "origin": flags.get("origin"),
                 }))
             if action == "show":
                 if len(positional) < 3:
@@ -125,47 +125,41 @@ def run(argv: list[str], context: dict | None = None) -> dict:
             if action == "incorporate":
                 return _ok(op_incorporate(opts, flags.get("strategy"), {
                     "mine": bool(flags.get("mine")), "route": flags.get("route"),
-                    "session": flags.get("session"),
+                    "session": flags.get("session"), "origin": flags.get("origin"),
                 }))
             if action == "validate":
                 return _ok(op_validate(opts, {
                     "record": flags.get("record"), "result": flags.get("result"),
                     "note": flags.get("note"), "strict": bool(flags.get("strict")),
+                    "origin": flags.get("origin"),
                 }))
             raise CliError(Exit.USAGE, f"unknown action: {action or '(missing)'} for domain {domain}")
 
-        if domain == "design":
+        if domain in ("design", "live"):
             config, config_path = load_config(cwd, flags)
             opts = {"cwd": cwd, "config": config, "config_path": config_path,
                     "format": flags.get("format") or "json"}
-            if action == "integrate":
-                return _ok(op_design_integrate(opts, {"framework": flags.get("framework"), "root": flags.get("root")}))
+            is_design = domain == "design"
+            if action == "install":
+                return _ok(op_design_install(opts, {"framework": flags.get("framework"), "root": flags.get("root")})
+                           if is_design else op_live_install(opts))
             if action == "create":
-                return _ok(op_design_create(opts, {"framework": flags.get("framework"), "name": flags.get("name")}))
-            if action == "serve":
-                from .server import start_server
-                root = flags.get("dir") or config["design"].get("root")
-                host = flags.get("host") or config["review"]["host"]
-                port = int(flags.get("port") or config["review"]["port"])
-                session = flags.get("session") or "default"
-                server = start_server(
-                    mode="design", host=host, port=port, root=root, target=None,
-                    cwd=cwd, config=config, session=session, environment="design",
-                )
-                return {"stdout": f"serving design at http://{host}:{port} (Ctrl+C to stop)\n",
-                        "stderr": "", "exit": Exit.OK, "keep_alive": server}
-            raise CliError(Exit.USAGE, f"unknown action: {action or '(missing)'} for domain {domain}")
-
-        if domain == "review":
-            config, config_path = load_config(cwd, flags)
-            opts = {"cwd": cwd, "config": config, "config_path": config_path, "format": flags.get("format")}
-            if action == "integrate":
+                return _ok(op_design_create(opts, {"framework": flags.get("framework"), "name": flags.get("name")})
+                           if is_design else op_live_create(opts, {"framework": flags.get("framework"), "name": flags.get("name")}))
+            if action == "start-review":
                 opts["format"] = flags.get("format") or "json"
-                return _ok(op_review_integrate(opts))
-            if action == "start":
                 cmd = parsed.get("cmd") or (positional[2:] if len(positional) > 2 else None)
-                opts["format"] = flags.get("format") or "json"
-                return _ok(op_review_start(opts, {
+                if is_design:
+                    return _ok(op_design_start(opts, {
+                        "dir": flags.get("dir"),
+                        "port": int(flags["port"]) if flags.get("port") else None,
+                        "host": flags.get("host"),
+                        "session": flags.get("session"),
+                        "environment": flags.get("environment"),
+                        "dry_run": bool(flags.get("dry-run")),
+                        "foreground": bool(flags.get("foreground")),
+                    }))
+                return _ok(op_live_start(opts, {
                     "url": flags.get("url"),
                     "cmd": " ".join(cmd) if cmd else None,
                     "target_port": int(flags["target-port"]) if flags.get("target-port") else None,
@@ -178,10 +172,10 @@ def run(argv: list[str], context: dict | None = None) -> dict:
                 }))
             if action == "status":
                 opts["format"] = flags.get("format") or "text"
-                return _ok(op_review_status(opts))
+                return _ok(op_live_status(opts))
             if action == "stop":
                 opts["format"] = flags.get("format") or "text"
-                return _ok(op_review_stop(opts))
+                return _ok(op_live_stop(opts))
             raise CliError(Exit.USAGE, f"unknown action: {action or '(missing)'} for domain {domain}")
 
         raise CliError(Exit.USAGE, f"unknown command: {domain}")
@@ -206,8 +200,8 @@ def _help() -> str:
         "tux <domain> <action> [arguments] [options]",
         "",
         "domains:",
-        "  design    integrate | create | serve",
-        "  review    integrate | start | status | stop",
+        "  design    install | create | start-review | status | stop",
+        "  live      install | create | start-review | status | stop",
         "  feedback  list | show | create | update | delete | clear | export | incorporate | validate",
         "",
         "options:",

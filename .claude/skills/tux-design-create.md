@@ -37,8 +37,9 @@ resolved prefix.
    interactions (tabs, modals, drawers, forms).
 5. Mark component instances with `data-tux-instance` so feedback on one
    instance never appears on another (SPC section 85).
-6. Run `tux design serve`, navigate every route, and verify the review
-   capability: create feedback on a component, reload, see the marker
-   restored, and confirm `tux feedback list --format json` returns it.
+6. Run `tux design start-review`, navigate every route, and verify the
+   review capability: create feedback on a component, reload, see the
+   marker restored, and confirm
+   `tux feedback list --format json` returns it.
 7. Report the created routes, components, and UI states with the
    verification result.

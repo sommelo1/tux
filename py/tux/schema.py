@@ -8,7 +8,7 @@ SCHEMA_VERSION = "1.0"
 
 FEEDBACK_TYPES = ["change", "issue", "question", "approval"]
 FEEDBACK_STATUSES = ["open", "incorporated", "resolved", "rejected"]
-ORIGIN_MODES = ["design", "review"]
+ORIGIN_MODES = ["design", "live"]
 
 _ID_RE = re.compile(r"^fb_[0-9A-HJKMNP-TV-Z]{26}$")
 

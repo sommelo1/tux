@@ -1,0 +1,12 @@
+exit 0
+{
+  "action": "create",
+  "kind": "live",
+  "framework": "vanilla",
+  "name": "checkout",
+  "root": "requirements/checkout/design",
+  "next": [
+    "tux live install",
+    "tux live start-review --url http://localhost:4173"
+  ]
+}
