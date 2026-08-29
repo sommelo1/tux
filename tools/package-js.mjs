@@ -5,7 +5,7 @@
  * - `npm pack` into dist/ (real tarball, used by tools/install-test.mjs)
  * - required files present, forbidden files absent
  */
-import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
+import { readFileSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -46,16 +46,7 @@ if (!pyInit.includes(`__version__ = "${version}"`)) fail(`py/tux/__init__.py ver
 // ── pack ──
 rmSync(join(distDir, 'tux-review'), { recursive: true, force: true });
 mkdirSync(distDir, { recursive: true });
-// npm packs the package dir (js/) — the repo-root README must ride along:
-const jsReadme = join(jsDir, 'README.md');
-const repoReadme = readFileSync(join(root, 'README.md'), 'utf8');
-writeFileSync(jsReadme, repoReadme, 'utf8');
-let packed;
-try {
-  packed = JSON.parse(npm(['pack', '--json', `--pack-destination`, distDir.replace(/\\/g, '/')], jsDir).trim());
-} finally {
-  rmSync(jsReadme, { force: true });
-}
+const packed = JSON.parse(npm(['pack', '--json', `--pack-destination`, distDir.replace(/\\/g, '/')], jsDir).trim());
 if (!Array.isArray(packed) || packed.length !== 1) fail('npm pack did not return exactly one package description');
 const files = (packed[0].files || []).map((f) => f.path);
 const tarball = join(distDir, packed[0].filename);
