@@ -219,8 +219,10 @@
 
   function buildShell() {
     ensureRoot().innerHTML = `
-      <button class="tux-launcher" data-tux-launcher data-tux-ui>⬢</button>
-      <span class="tux-launcher-hint" data-tux-hint data-tux-ui></span>
+      <div class="tux-float" data-tux-float data-tux-ui>
+        <button class="tux-launcher" data-tux-launcher data-tux-ui>⬢</button>
+        <span class="tux-launcher-hint" data-tux-hint data-tux-ui></span>
+      </div>
       <aside class="tux-sidebar" data-tux-sidebar data-tux-ui>
         <div class="tux-sb-head"><span>TUX Review</span><button class="tux-sb-close" data-tux-sb-close>✕</button></div>
         <div class="tux-sb-meta" data-tux-sb-meta></div>
@@ -228,7 +230,7 @@
       </aside>
       <div class="tux-layer" data-tux-layer data-tux-ui></div>
       <div class="tux-toast" data-tux-toast data-tux-ui></div>`;
-    const launcher = root().querySelector('[data-tux-launcher]');
+    const launcher = document.querySelector('[data-tux-launcher]');
     launcher.addEventListener('click', () => setMode(!mode));
     root().querySelector('[data-tux-sb-close]').addEventListener('click', closeSidebar);
     document.addEventListener('keydown', (e) => {
@@ -240,12 +242,43 @@
     });
   }
 
+  // ─── top layer: keep the launcher clickable above modal backdrops ───
+  // While a native <dialog> is open, everything outside the top layer sits
+  // below its backdrop. The floating activation surface therefore moves
+  // into the open dialog and returns when it closes (same wrapping
+  // technique as the route tracking above).
+  let topLayerBound = false;
+  function bindTopLayer() {
+    if (topLayerBound) return;
+    topLayerBound = true;
+    const floatEl = () => document.querySelector('[data-tux-float]');
+    const enter = (dialog) => {
+      const f = floatEl();
+      if (f && f.parentElement !== dialog) dialog.appendChild(f);
+    };
+    const exit = () => {
+      const f = floatEl();
+      const r = root();
+      if (f && r && f.parentElement !== r) r.appendChild(f);
+    };
+    const proto = window.HTMLDialogElement && HTMLDialogElement.prototype;
+    if (!proto) return;
+    for (const name of ['showModal', 'close']) {
+      const orig = proto[name];
+      proto[name] = function (...args) {
+        const r = orig.apply(this, args);
+        if (name === 'showModal') enter(this); else exit();
+        return r;
+      };
+    }
+  }
+
   // Launcher state: boot invite → persistent "commenting on/off" label
   // plus a hover tooltip on the collapsed button.
   let interacted = false;
   function updateLauncherHint() {
-    const launcher = root().querySelector('[data-tux-launcher]');
-    const hint = root().querySelector('[data-tux-hint]');
+    const launcher = document.querySelector('[data-tux-launcher]');
+    const hint = document.querySelector('[data-tux-hint]');
     if (!launcher || !hint) return;
     let text;
     if (!interacted) {
@@ -276,7 +309,7 @@
   function setMode(v) {
     mode = !!v;
     document.body.classList.toggle('tux-mode', mode);
-    root().querySelector('[data-tux-launcher]').classList.toggle('tux-active', mode);
+    document.querySelector('[data-tux-launcher]').classList.toggle('tux-active', mode);
     if (!interacted) interacted = true;
     updateLauncherHint();
     if (mode) {
@@ -520,6 +553,7 @@
     ensureStyles();
     buildShell();
     updateLauncherHint();
+    bindTopLayer();
     document.addEventListener('mouseover', onMouseOver, true);
     document.addEventListener('click', onClick, true);
     trackRoute(() => { refresh(); });

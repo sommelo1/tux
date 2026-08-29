@@ -20,19 +20,39 @@
   color: var(--tux-text);
 }
 
-/* Launcher: light gray when off, recording red (pulsing) when commenting. */
-#tux-root .tux-launcher {
+/* Floating activation surface (launcher + state label). While a native
+   <dialog> is open, the client reparents this element into the dialog so
+   it stays clickable above the backdrop — the tokens are declared here so
+   they apply in both parents. */
+#tux-root .tux-float,
+dialog[open] .tux-float {
   position: fixed; right: 14px; bottom: 14px; z-index: 2147483000;
+  display: flex; align-items: center; gap: 10px;
+  --tux-primary: var(--primary, #569cd6);
+  --tux-surface: var(--card-bg, #fff);
+  --tux-surface2: var(--chip-bg, #f0f2f5);
+  --tux-border: var(--card-border, rgba(0, 0, 0, .12));
+  --tux-text: var(--on-surface, #1e1e1e);
+  --tux-muted: var(--outline, #6e6e6e);
+  --tux-rec: #e53935;
+  --tux-shadow: 0 4px 16px rgba(0, 0, 0, .16);
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--tux-text);
+}
+
+/* Launcher: light gray when off, recording red (pulsing) when commenting. */
+.tux-float .tux-launcher {
   width: 44px; height: 44px; border-radius: 50%;
   border: 1px solid var(--tux-border); cursor: pointer;
   background: var(--tux-surface2); color: var(--tux-muted);
   font-size: 20px; box-shadow: var(--tux-shadow);
 }
-#tux-root .tux-launcher.tux-active {
+.tux-float .tux-launcher.tux-active {
   background: var(--tux-rec); color: #fff; border-color: var(--tux-rec);
   animation: tux-rec-pulse 1.6s ease-out infinite;
 }
-#tux-root .tux-launcher.tux-invite {
+.tux-float .tux-launcher.tux-invite {
   animation: tux-invite-pulse 2s ease-in-out infinite;
 }
 @keyframes tux-rec-pulse {
@@ -46,20 +66,19 @@
 }
 
 /* Persistent state label next to the launcher. */
-#tux-root .tux-launcher-hint {
-  position: fixed; right: 68px; bottom: 14px; z-index: 2147483000;
+.tux-float .tux-launcher-hint {
   height: 44px; display: flex; align-items: center;
   padding: 0 14px; border-radius: 999px;
   background: var(--tux-surface); border: 1px solid var(--tux-border);
   box-shadow: var(--tux-shadow); color: var(--tux-text);
   font-size: 12.5px; font-weight: 600; white-space: nowrap;
 }
-#tux-root .tux-launcher-hint::before {
+.tux-float .tux-launcher-hint::before {
   content: ""; width: 8px; height: 8px; border-radius: 50%;
   background: var(--tux-muted); margin-right: 8px; flex: none;
 }
-#tux-root .tux-launcher-hint.tux-hint-on::before { background: var(--tux-rec); }
-#tux-root .tux-launcher-hint.tux-hint-invite::before {
+.tux-float .tux-launcher-hint.tux-hint-on::before { background: var(--tux-rec); }
+.tux-float .tux-launcher-hint.tux-hint-invite::before {
   background: var(--tux-primary);
   animation: tux-invite-pulse 2s ease-in-out infinite;
 }
