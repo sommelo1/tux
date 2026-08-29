@@ -251,15 +251,22 @@
   function bindTopLayer() {
     if (topLayerBound) return;
     topLayerBound = true;
-    const floatEl = () => document.querySelector('[data-tux-float]');
+    // Sidebar and toast move together with the float: while a modal is
+    // open they would otherwise sit behind the backdrop.
+    const MOVED = ['[data-tux-float]', '[data-tux-sidebar]', '[data-tux-toast]'];
     const enter = (dialog) => {
-      const f = floatEl();
-      if (f && f.parentElement !== dialog) dialog.appendChild(f);
+      for (const sel of MOVED) {
+        const n = document.querySelector(sel);
+        if (n && n.parentElement !== dialog) dialog.appendChild(n);
+      }
     };
     const exit = () => {
-      const f = floatEl();
       const r = root();
-      if (f && r && f.parentElement !== r) r.appendChild(f);
+      if (!r) return;
+      for (const sel of MOVED) {
+        const n = document.querySelector(sel);
+        if (n && n.parentElement !== r) r.appendChild(n);
+      }
     };
     const proto = window.HTMLDialogElement && HTMLDialogElement.prototype;
     if (!proto) return;
@@ -298,7 +305,7 @@
   }
 
   function toast(msg) {
-    const t = root().querySelector('[data-tux-toast]');
+    const t = document.querySelector('[data-tux-toast]');
     if (!t) return;
     t.textContent = msg;
     t.classList.add('tux-visible');
@@ -502,14 +509,14 @@
 
   // ─── sidebar ───
   function openSidebar() {
-    root().querySelector('[data-tux-sidebar]').classList.add('tux-open');
+    document.querySelector('[data-tux-sidebar]').classList.add('tux-open');
     renderSidebar();
   }
   function closeSidebar() {
-    root().querySelector('[data-tux-sidebar]').classList.remove('tux-open');
+    document.querySelector('[data-tux-sidebar]').classList.remove('tux-open');
   }
   function renderSidebar() {
-    const sb = root().querySelector('[data-tux-sidebar]');
+    const sb = document.querySelector('[data-tux-sidebar]');
     if (!sb) return;
     const open = items.filter((i) => i.status === 'open').length;
     sb.querySelector('[data-tux-sb-meta]').textContent =

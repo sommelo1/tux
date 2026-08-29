@@ -140,31 +140,33 @@ body.tux-mode * { cursor: crosshair !important; }
 :is(#tux-root, dialog[open]) .tux-btn-danger { background: none; border: 1px solid var(--tux-danger); color: var(--tux-danger); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
 :is(#tux-root, dialog[open]) .tux-x { background: none; border: none; color: var(--tux-muted); cursor: pointer; }
 
-#tux-root .tux-sidebar {
+/* Sidebar and toast can be reparented into an open dialog together with
+   the float — the dialog[open] alternative keeps them styled there. */
+:is(#tux-root, dialog[open]) .tux-sidebar {
   position: fixed; right: 0; top: 0; bottom: 0; z-index: 2147482999;
   width: 300px; background: var(--tux-surface); border-left: 1px solid var(--tux-border);
   box-shadow: var(--tux-shadow); transform: translateX(100%); transition: transform .18s ease;
   display: flex; flex-direction: column;
 }
-#tux-root .tux-sidebar.tux-open { transform: translateX(0); }
-#tux-root .tux-sb-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; font-weight: 600; border-bottom: 1px solid var(--tux-border); }
-#tux-root .tux-sb-close { background: none; border: none; color: var(--tux-muted); cursor: pointer; }
-#tux-root .tux-sb-meta { padding: 8px 14px; font-size: 11px; color: var(--tux-muted); border-bottom: 1px solid var(--tux-border); }
-#tux-root .tux-sb-list { overflow: auto; flex: 1; padding: 8px; }
-#tux-root .tux-sb-item { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; padding: 8px; border-radius: 10px; background: var(--tux-surface2); margin-bottom: 8px; cursor: pointer; }
-#tux-root .tux-sb-item.tux-done { opacity: .55; }
-#tux-root .tux-sb-type { grid-row: span 2; align-self: center; font-size: 10px; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; background: var(--tux-yellow); }
-#tux-root .tux-type-approval { background: var(--tux-green); color: #fff; }
-#tux-root .tux-type-question { background: var(--tux-primary); color: #fff; }
-#tux-root .tux-type-issue { background: var(--tux-danger); color: #fff; }
-#tux-root .tux-sb-text { font-size: 12px; line-height: 1.4; word-break: break-word; }
-#tux-root .tux-sb-route { font-size: 10px; color: var(--tux-muted); }
-#tux-root .tux-sb-empty { color: var(--tux-muted); font-size: 12px; padding: 12px; }
+:is(#tux-root, dialog[open]) .tux-sidebar.tux-open { transform: translateX(0); }
+:is(#tux-root, dialog[open]) .tux-sb-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; font-weight: 600; border-bottom: 1px solid var(--tux-border); }
+:is(#tux-root, dialog[open]) .tux-sb-close { background: none; border: none; color: var(--tux-muted); cursor: pointer; }
+:is(#tux-root, dialog[open]) .tux-sb-meta { padding: 8px 14px; font-size: 11px; color: var(--tux-muted); border-bottom: 1px solid var(--tux-border); }
+:is(#tux-root, dialog[open]) .tux-sb-list { overflow: auto; flex: 1; padding: 8px; }
+:is(#tux-root, dialog[open]) .tux-sb-item { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; padding: 8px; border-radius: 10px; background: var(--tux-surface2); margin-bottom: 8px; cursor: pointer; }
+:is(#tux-root, dialog[open]) .tux-sb-item.tux-done { opacity: .55; }
+:is(#tux-root, dialog[open]) .tux-sb-type { grid-row: span 2; align-self: center; font-size: 10px; text-transform: uppercase; padding: 3px 7px; border-radius: 999px; background: var(--tux-yellow); }
+:is(#tux-root, dialog[open]) .tux-type-approval { background: var(--tux-green); color: #fff; }
+:is(#tux-root, dialog[open]) .tux-type-question { background: var(--tux-primary); color: #fff; }
+:is(#tux-root, dialog[open]) .tux-type-issue { background: var(--tux-danger); color: #fff; }
+:is(#tux-root, dialog[open]) .tux-sb-text { font-size: 12px; line-height: 1.4; word-break: break-word; }
+:is(#tux-root, dialog[open]) .tux-sb-route { font-size: 10px; color: var(--tux-muted); }
+:is(#tux-root, dialog[open]) .tux-sb-empty { color: var(--tux-muted); font-size: 12px; padding: 12px; }
 
-#tux-root .tux-toast {
+:is(#tux-root, dialog[open]) .tux-toast {
   position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(20px);
   z-index: 2147483003; background: var(--tux-text); color: var(--tux-surface);
   padding: 8px 16px; border-radius: 999px; font-size: 12px; opacity: 0;
   transition: opacity .15s ease, transform .15s ease; pointer-events: none;
 }
-#tux-root .tux-toast.tux-visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+:is(#tux-root, dialog[open]) .tux-toast.tux-visible { opacity: 1; transform: translateX(-50%) translateY(0); }

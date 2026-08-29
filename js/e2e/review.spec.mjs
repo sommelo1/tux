@@ -111,6 +111,13 @@ test('editor and markers render styled inside native dialogs (SPC 11, 12)', asyn
   await page.click('[data-tux-launcher]');
   await expect.poll(() => page.evaluate(() => window.TUXReview.mode)).toBe(true);
 
+  // sidebar and toast reparent into the dialog too — the close button
+  // must be clickable above the backdrop
+  const sidebar = page.locator('#coupon-modal .tux-sidebar.tux-open');
+  await expect(sidebar).toBeVisible();
+  await page.click('#coupon-modal [data-tux-sb-close]');
+  await expect(page.locator('#coupon-modal .tux-sidebar')).not.toHaveClass(/tux-open/);
+
   // the editor portals into the dialog and must arrive styled, not as
   // unstyled DOM (it lives outside #tux-root when portaled)
   await page.click('[data-tux-id="coupon-input"]');
@@ -136,6 +143,7 @@ test('editor and markers render styled inside native dialogs (SPC 11, 12)', asyn
   // save → the marker lands inside the dialog, styled as well
   await editor.locator('[data-ed-text]').fill('Styled inside the dialog');
   await editor.locator('[data-act="save"]').click();
+  await expect(page.locator('#coupon-modal .tux-toast.tux-visible')).toBeVisible();
   const marker = page.locator('#coupon-modal .tux-marker');
   await expect(marker).toHaveCount(1);
   const mStyle = await marker.evaluate((el) => {
