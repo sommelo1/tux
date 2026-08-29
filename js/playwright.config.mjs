@@ -11,7 +11,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const example = join(here, '..', '..', 'examples', 'design-vanilla');
 
 export default defineConfig({
-  testDir: here,
+  testDir: join(here, 'e2e'),
   globalSetup: join(here, 'e2e', 'global-setup.mjs'),
   timeout: 30000,
   use: {
