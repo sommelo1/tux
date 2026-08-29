@@ -20,14 +20,14 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: 'node ../../js/bin/tux.js design serve --port 4181',
+      command: 'node ../../js/bin/tux.js design start-review --foreground --port 4181',
       cwd: example,
       url: 'http://127.0.0.1:4181/api/tux/health',
       reuseExistingServer: true,
       timeout: 30000,
     },
     {
-      command: 'node ../../js/bin/tux.js design serve --port 4182 --config ../../js/e2e/fixtures/config-disabled.json',
+      command: 'node ../../js/bin/tux.js design start-review --foreground --port 4182 --config ../../js/e2e/fixtures/config-disabled.json',
       cwd: example,
       url: 'http://127.0.0.1:4182/api/tux/health',
       reuseExistingServer: true,

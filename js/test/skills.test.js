@@ -36,7 +36,7 @@ for (const name of sources) {
   for (const section of requiredSections) {
     check(text.includes(section), `${name}: ${section} section present`);
   }
-  check(text.includes('tux <domain> <action>') || text.includes('tux design serve') || text.includes('tux feedback'),
+  check(text.includes('tux <domain> <action>') || text.includes('tux design start-review') || text.includes('tux feedback'),
     `${name}: uses canonical CLI vocabulary`);
   check(!/```/.test(text.split('## Resolve the CLI')[0].split('---')[2] || ''), `${name}: no code fences before Workflow`);
 }

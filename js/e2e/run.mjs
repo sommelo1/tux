@@ -1,6 +1,6 @@
 /**
  * E2E orchestrator: starts the three fixture servers (default-enabled
- * design serve, config-disabled design serve, TUX-free static server),
+ * design start-review, config-disabled design start-review, TUX-free static server),
  * waits for health, runs Playwright, then tears everything down.
  */
 import { spawn, execSync } from 'node:child_process';

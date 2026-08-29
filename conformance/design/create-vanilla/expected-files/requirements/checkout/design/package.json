@@ -2,5 +2,5 @@
   "name": "tux-design",
   "version": "0.1.0",
   "private": true,
-  "description": "Clickable design (vanilla) — serve with: tux design serve"
+  "description": "Clickable design (vanilla) — review with: tux design start-review"
 }
