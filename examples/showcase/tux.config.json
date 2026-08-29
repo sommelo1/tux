@@ -1,0 +1,18 @@
+{
+  "project_id": "tux-showcase",
+  "design": {
+    "root": "."
+  },
+  "review": {
+    "enabled": true,
+    "store": ".tux/feedback.json",
+    "host": "127.0.0.1",
+    "port": 4321
+  },
+  "identity": {
+    "provider": "local",
+    "user_id": "anonymous",
+    "display_name": "Anonymous",
+    "admins": []
+  }
+}
