@@ -128,6 +128,15 @@ with a coupon modal) served by the design server with the Review Client
 injected and pre-seeded with five example comments. Fully isolated —
 everything it writes stays in `examples/showcase/.tux/` (gitignored).
 
+![TUX showcase recording: the ⬢ launcher activates review mode, the product
+price is marked, an issue comment is captured in the editor, reopened from
+its orange marker and edited, then deleted from the same marker](docs/showcase-review.gif)
+
+The full review cycle in under thirty seconds: click the ⬢ launcher (or
+press `Alt+T`), mark any element, capture structured feedback in the
+editor, reopen it from its marker to edit it, and delete it from the same
+marker when it is resolved.
+
 ```bash
 cd examples/showcase
 start.cmd        # Windows — menu: 1) Node   2) Python
@@ -383,6 +392,7 @@ batches alongside. Stopping a review server never deletes feedback.
 ```text
 SPC.md            normative specification
 conformance/      byte-identical behavior fixtures (source of truth)
+docs/             README assets (showcase recording)
 skills/           canonical skill sources → deployed to .claude/.hermes/.kilo/js/py
 js/               npm package: CLI, server, Review Client, tests, Playwright E2E
 py/               PyPI package: CLI + server (stdlib-only), pytest suite
