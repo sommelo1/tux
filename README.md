@@ -14,18 +14,48 @@ and UI states — while humans, CLI tools, scripts, and LLM agents all work
 with the same canonical data. No Figma, no annotation boards, no copy-paste
 of comments into tickets.
 
-TUX covers **two distinct use cases** — a clickable design world and a live
-application world. Both attach structured, machine-readable feedback to the
-running UI and share one canonical feedback core (one store, one vocabulary);
-they differ in what is reviewed and how the Review Client reaches it.
+TUX has **two distinct worlds** — design TUX reviews clickable mockups,
+live TUX reviews running applications. Both attach structured,
+machine-readable feedback to the running UI and share one canonical
+feedback core (one store, one vocabulary); they differ in what is
+reviewed and how the Review Client reaches the page.
 
-### Use case 1 — Design review (clickable mockup)
+## Contents
 
-For requirements and design work: screens become runnable, clickable designs
-(vanilla, react, vue, angular). TUX is installed into the design environment,
-the design is served with the Review Client, and feedback carries
-`origin: design`. Incorporation updates the design itself; validation
-verifies every change in the running mockup.
+- [TUX Design — review clickable mockups](#tux-design--review-clickable-mockups)
+- [TUX Live — review running applications](#tux-live--review-running-applications)
+- [The shared feedback core](#the-shared-feedback-core)
+- [Interactive showcase](#interactive-showcase)
+- [Why TUX](#why-tux)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Skills for agents](#skills-for-agents)
+- [How it works](#how-it-works)
+- [Documentation](#documentation)
+- [Repository layout](#repository-layout)
+- [Development](#development)
+- [License](#license)
+
+## TUX Design — review clickable mockups
+
+For requirements and design work: screens become runnable, clickable
+designs (vanilla, react, vue, angular). TUX is installed into the design
+environment, the design is served with the Review Client, and feedback
+carries `origin: design`. Incorporation updates the design itself;
+validation verifies every change in the running mockup.
+
+```text
+tux design    install | create | start-review | status | stop-review
+```
+
+```bash
+npx --yes --package=tux-uix tux design install --framework vanilla   # wire config + review
+npx --yes --package=tux-uix tux design create --framework vanilla --name checkout
+npx --yes --package=tux-uix tux design start-review                  # → http://127.0.0.1:4173
+npx --yes --package=tux-uix tux design status                        # running state + feedback count
+npx --yes --package=tux-uix tux design stop-review                   # end the session
+```
 
 ```mermaid
 flowchart TD
@@ -39,15 +69,27 @@ flowchart TD
     VAL -. "next design cycle" .-> DS
 ```
 
-### Use case 2 — Live review (running application)
+## TUX Live — review running applications
 
-For real applications in development, test, staging, or review environments:
-TUX reaches the app without build changes — `tux live install` selects the
-least-invasive strategy (reverse-proxy injection by default) and
-`tux live start-review --url …` attaches the Review Client through the
-proxy. Feedback carries `origin: live`; incorporation drives implementation
-in the application's own codebase, and validation verifies against the
-running app.
+For real applications in development, test, staging, or review
+environments: TUX reaches the app without build changes — `tux live
+install` selects the least-invasive strategy (reverse-proxy injection by
+default) and `tux live start-review --url …` attaches the Review Client
+through the proxy. Feedback carries `origin: live`; incorporation drives
+implementation in the application's own codebase, and validation verifies
+against the running app.
+
+```text
+tux live      install | create | start-review | status | stop-review
+```
+
+```bash
+pipx install tux-uix
+tux live install                                   # detect setup, pick least-invasive strategy
+tux live start-review --url http://localhost:3000  # proxy + Review Client
+tux live status
+tux live stop-review                               # app untouched, feedback kept
+```
 
 ```mermaid
 flowchart TD
@@ -60,24 +102,50 @@ flowchart TD
     VAL -. "next live cycle" .-> LS
 ```
 
-Both cycles use the same feedback verbs — `tux feedback show`, `export`,
-`incorporate`, `validate` — scoped with `--origin design|live`, and write
-into the same canonical store. Stopping a review server never deletes
-feedback.
+## The shared feedback core
 
-## Contents
+Both worlds write the same canonical store and speak the same verbs,
+scoped with `--origin design|live`:
 
-- [Why TUX](#why-tux)
-- [Quick start](#quick-start)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Skills for agents](#skills-for-agents)
-- [How it works](#how-it-works)
-- [Documentation](#documentation)
-- [Repository layout](#repository-layout)
-- [Development](#development)
-- [License](#license)
+```bash
+tux feedback show --status open --origin design --format json    # survey
+tux feedback show fb_01M14502C04SWVHV231VZHZ4D6                  # one item, complete
+tux feedback incorporate --strategy tasks --format json          # process + batch record
+tux feedback validate --record fb_01M14502C04SWVHV231VZHZ4D6 --result passed --note "verified in browser"
+```
+
+Stopping a review server never deletes feedback. See [Usage](#usage) for
+the full grammar and a complete canonical item.
+
+## Interactive showcase
+
+The fastest way to see TUX working: [`examples/showcase/`](examples/showcase)
+is a multipage clickable design (Home, Products, Product detail, Checkout
+with a coupon modal) served by the design server with the Review Client
+injected and pre-seeded with five example comments. Fully isolated —
+everything it writes stays in `examples/showcase/.tux/` (gitignored).
+
+```bash
+cd examples/showcase
+start.cmd        # Windows — menu: 1) Node   2) Python
+./start.sh       # macOS / Linux — same menu
+```
+
+| Task | Windows | macOS / Linux |
+|---|---|---|
+| Start (interactive menu) | `start.cmd` | `./start.sh` |
+| Start with a specific engine | `start.cmd python` | `./start.sh node` |
+| Reset the example comments | `start.cmd node --fresh` | `./start.sh node --fresh` |
+| Keep the server in the foreground | `start.cmd node --foreground` | `./start.sh node --foreground` |
+| Stop the server | `start.cmd stop` | `./start.sh stop` |
+
+How it works: the scripts run inside the folder (all state stays local),
+resolve the `tux` binary (repo-local `js/bin` / `.venv` first, then `tux`
+on PATH, `npx`, `pipx`), seed the comments via the CLI on first start,
+and start the design server on port 4321. Then click the ⬢ launcher (or
+press `Alt+T`) — it shows the commenting state at all times — pick any
+element, leave feedback, reload or navigate: markers restore. Read
+everything back with `tux feedback show --format json` from that folder.
 
 ## Why TUX
 
@@ -102,38 +170,6 @@ feedback.
 - **Deterministic.** Canonical JSON with fixed key order, deterministic
   ULIDs, frozen exit codes, no locale or host paths in output — identical
   input always produces identical bytes.
-
-## Quick start
-
-```bash
-# 1) Install TUX into the current project (creates tux.config.json)
-npx --yes --package=tux-uix tux design install --framework vanilla
-
-# 2) Scaffold a runnable multi-route design
-npx --yes --package=tux-uix tux design create --framework vanilla --name checkout
-
-# 3) Start the review server
-npx --yes --package=tux-uix tux design start-review
-# → http://127.0.0.1:4173
-```
-
-Review in the browser: click the ⬢ launcher (or press `Alt+T`), pick any
-element, leave structured feedback. Then read it back deterministically:
-
-```bash
-tux feedback show --status open --format json
-tux feedback incorporate --strategy tasks --format json
-tux feedback validate --record fb_01M14502C04SWVHV231VZHZ4D6 --result passed --note "verified in browser"
-```
-
-For an **existing application** (live review), use the `live` domain
-instead — least-invasive by default via reverse-proxy injection:
-
-```bash
-pipx install tux-uix
-tux live install
-tux live start-review --url http://localhost:3000
-```
 
 ## Installation
 
@@ -315,7 +351,7 @@ skills/           canonical skill sources → deployed to .claude/.hermes/.kilo/
 js/               npm package: CLI, server, Review Client, tests, Playwright E2E
 py/               PyPI package: CLI + server (stdlib-only), pytest suite
 tools/            gen-case-inputs, gen-expected, sync-artifacts, packaging, release
-examples/         runnable vanilla design used by the E2E suite
+examples/         runnable designs: E2E fixture (design-vanilla) + interactive showcase (showcase)
 ```
 
 ## Development
