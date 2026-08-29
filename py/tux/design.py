@@ -18,8 +18,12 @@ def _text_report(lines: list[str]) -> dict:
 
 
 def _rel_path(cwd: str, p: str) -> str:
-    rel = str(Path(p).relative_to(cwd)) if str(p).startswith(str(Path(cwd))) else p
-    return rel
+    """Return a portable project-relative path when *p* is inside *cwd*."""
+    try:
+        rel = Path(p).resolve().relative_to(Path(cwd).resolve())
+    except ValueError:
+        return p
+    return "." if str(rel) == "." else rel.as_posix()
 
 
 def op_design_install(opts: dict, spec: dict) -> dict:
