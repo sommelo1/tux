@@ -333,20 +333,22 @@
   function clearHover() {
     if (hoverEl) { hoverEl.classList.remove('tux-hover'); hoverEl = null; }
   }
-  // TUX's own chrome (overlay root, editor, markers) is never reviewable —
-  // independent of any user-set [data-tux-ui] scope markers (SPC 16, 66).
+  // TUX's own chrome (overlay root, float, sidebar, layer, toast, editor,
+  // markers) is never reviewable — independent of any user-set [data-tux-ui]
+  // scope markers (SPC 16, 66). The attribute selectors also match while the
+  // float/sidebar/toast reparent into a dialog's top layer.
+  const TUX_CHROME = '#tux-root, [data-tux-float], [data-tux-sidebar], [data-tux-toast], [data-tux-layer], .tux-editor, .tux-marker';
   function inChrome(el) {
-    if (el.closest && el.closest('.tux-editor,.tux-marker,.tux-toast')) return true;
-    const r = root();
-    return !!(r && (r === el || r.contains(el)));
+    return !!(el.closest && el.closest(TUX_CHROME));
   }
-  // [data-tux-ui] marks reviewable scopes. With no scope on the page the
-  // whole document is reviewable; with scopes, only inside them.
+  // [data-tux-ui] marks reviewable scopes. With no user-set scope on the
+  // page the whole document is reviewable; with scopes, only inside them.
+  // TUX's own chrome never counts as a scope — it carries data-tux-ui too
+  // and would otherwise make every page element unreachable (SPC 16, 66).
   function inScope(el) {
-    const scopes = document.querySelectorAll('[data-tux-ui]');
+    const scopes = [...document.querySelectorAll('[data-tux-ui]')].filter((s) => !inChrome(s));
     if (!scopes.length) return true;
-    for (const s of scopes) if (s.contains(el)) return true;
-    return false;
+    return scopes.some((s) => s.contains(el));
   }
   function onMouseOver(e) {
     if (!mode) return;
