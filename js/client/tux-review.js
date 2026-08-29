@@ -333,18 +333,33 @@
   function clearHover() {
     if (hoverEl) { hoverEl.classList.remove('tux-hover'); hoverEl = null; }
   }
+  // TUX's own chrome (overlay root, editor, markers) is never reviewable —
+  // independent of any user-set [data-tux-ui] scope markers (SPC 16, 66).
+  function inChrome(el) {
+    if (el.closest && el.closest('.tux-editor,.tux-marker,.tux-toast')) return true;
+    const r = root();
+    return !!(r && (r === el || r.contains(el)));
+  }
+  // [data-tux-ui] marks reviewable scopes. With no scope on the page the
+  // whole document is reviewable; with scopes, only inside them.
+  function inScope(el) {
+    const scopes = document.querySelectorAll('[data-tux-ui]');
+    if (!scopes.length) return true;
+    for (const s of scopes) if (s.contains(el)) return true;
+    return false;
+  }
   function onMouseOver(e) {
     if (!mode) return;
     clearHover();
     const t = e.target.closest('body *');
-    if (t && !t.closest('[data-tux-ui]')) {
+    if (t && !inChrome(t) && inScope(t)) {
       t.classList.add('tux-hover');
       hoverEl = t;
     }
   }
   function onClick(e) {
     if (!mode) return;
-    if (e.target.closest('[data-tux-ui]')) return;
+    if (inChrome(e.target) || !inScope(e.target)) return;
     e.preventDefault();
     e.stopPropagation();
     const target = e.target.closest('body *');
