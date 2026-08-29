@@ -22,8 +22,8 @@ Run from this directory (double-click works for `start.cmd`):
 | Stop server | `start.cmd stop` | `./start.sh stop` |
 
 The scripts resolve the `tux` binary in this order — `node`: `tux` on
-PATH → repo-local `js/bin/tux.js` → `npx --yes --package=tux-uix tux`;
-`python`: repo-local `.venv` → `tux` on PATH → `pipx run tux-uix tux`.
+PATH → repo-local `js/bin/tux.js` → `npx --yes --package=tux-review tux`;
+`python`: repo-local `.venv` → `tux` on PATH → `pipx run tux-review tux`.
 So the showcase works both inside this repository and standalone.
 
 ## What it shows

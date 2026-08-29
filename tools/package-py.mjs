@@ -39,7 +39,7 @@ const pyInit = readFileSync(join(root, 'py', 'tux', '__init__.py'), 'utf8');
 if (!pyproject.includes(`version = "${version}"`)) fail(`pyproject.toml version does not match ${version}`);
 if (!pyInit.includes(`__version__ = "${version}"`)) fail(`py/tux/__init__.py version does not match ${version}`);
 
-for (const p of [join(pyDir, 'build'), join(pyDir, 'dist'), join(pyDir, 'tux_uix.egg-info')]) {
+for (const p of [join(pyDir, 'build'), join(pyDir, 'dist'), join(pyDir, 'tux_review.egg-info')]) {
   rmSync(p, { recursive: true, force: true });
 }
 mkdirSync(distDir, { recursive: true });
@@ -92,7 +92,7 @@ if sdist_missing:
     problems.append('sdist missing: ' + ', '.join(sdist_missing))
 if wheel_forbidden:
     problems.append('wheel forbidden content: ' + ', '.join(wheel_forbidden))
-meta = zipfile.ZipFile(wheel).read('tux_uix-' + version + '.dist-info/METADATA').decode('utf-8')
+meta = zipfile.ZipFile(wheel).read('tux_review-' + version + '.dist-info/METADATA').decode('utf-8')
 m = re.search(r'^Version: (.+)$', meta, re.M)
 if not m or m.group(1).strip() != version:
     problems.append(f'wheel metadata version mismatch: {m and m.group(1)!r} != {version!r}')

@@ -16,8 +16,8 @@ TUX must exist as a deterministic CLI. Resolve it in this order and stop
 at the first hit:
 
 1. `tux --version` on PATH → use it.
-2. `npx --yes --package=tux-uix tux --version` → use `npx --yes --package=tux-uix tux …`.
-3. `pipx run tux-uix tux --version` → prefix every command with `pipx run tux-uix`.
+2. `npx --yes --package=tux-review tux --version` → use `npx --yes --package=tux-review tux …`.
+3. `pipx run tux-review tux --version` → prefix every command with `pipx run tux-review`.
 
 All commands below are written as `tux <domain> <action>`; apply the
 resolved prefix.

@@ -90,4 +90,4 @@ run('git', ['tag', '-a', `v${version}`, '-m', `v${version}`], root);
 run('git', ['push', 'origin', `v${version}`], root);
 
 console.log(`Release ${version} committed, pushed and tagged as v${version}`);
-console.log(`Artifacts in dist/ — publish with: npm publish dist/tux-uix-${version}.tgz · twine upload dist/tux_uix-${version}*`);
+console.log(`Artifacts in dist/ — publish with: npm publish dist/tux-review-${version}.tgz · twine upload dist/tux_review-${version}*`);

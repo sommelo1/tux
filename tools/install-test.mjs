@@ -34,7 +34,7 @@ const python = existsSync(repoPy) ? repoPy : (process.platform === 'win32' ? 'py
 const keep = process.argv.includes('--keep');
 
 const version = JSON.parse(readFileSync(join(root, 'js', 'package.json'), 'utf8')).version;
-const tarball = join(distDir, `tux-uix-${version}.tgz`);
+const tarball = join(distDir, `tux-review-${version}.tgz`);
 const wheel = readdirSync(distDir).find((f) => f.endsWith('.whl'));
 if (!existsSync(tarball) || !wheel) {
   console.error('dist/ artifacts missing — run tools/package-js.mjs and tools/package-py.mjs first');
@@ -119,10 +119,10 @@ try {
   mkdirSync(npmEnv, { recursive: true });
   writeFileSync(join(npmEnv, 'package.json'), JSON.stringify({
     name: 'tux-install-test', private: true,
-    dependencies: { 'tux-uix': `file:${tarball.replace(/\\/g, '/')}` },
+    dependencies: { 'tux-review': `file:${tarball.replace(/\\/g, '/')}` },
   }, null, 2) + '\n');
   npm(['install', '--no-audit', '--no-fund'], npmEnv);
-  const cli = join(npmEnv, 'node_modules', 'tux-uix', 'bin', 'tux.js');
+  const cli = join(npmEnv, 'node_modules', 'tux-review', 'bin', 'tux.js');
   check(readFileSync(cli, 'utf8').length > 0, 'npm: tarball installed into dedicated env');
   check(run('node', [cli, '--version'], npmEnv) === `tux ${version}`, `npm: tux --version → tux ${version}`);
 
@@ -142,7 +142,7 @@ try {
     check(existsSync(join(scaffold, 'package.json')) && existsSync(join(scaffold, scaffoldMarker[fw])),
       `npm: design create ${fw} → scaffold complete`);
   }
-  const pkgRoot = join(npmEnv, 'node_modules', 'tux-uix');
+  const pkgRoot = join(npmEnv, 'node_modules', 'tux-review');
   const skillCount = readdirSync(join(pkgRoot, 'skills')).filter((f) => f.endsWith('.md')).length;
   check(skillCount === 7, `npm: 7 skills shipped (found ${skillCount})`);
   check(existsSync(join(pkgRoot, 'client', 'tux-review.js')), 'npm: review client shipped');

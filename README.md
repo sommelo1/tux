@@ -1,7 +1,7 @@
 # TUX
 
-[![npm](https://img.shields.io/npm/v/tux-uix?logo=npm)](https://www.npmjs.com/package/tux-uix)
-[![PyPI](https://img.shields.io/pypi/v/tux-uix?logo=pypi)](https://pypi.org/project/tux-uix/)
+[![npm](https://img.shields.io/npm/v/tux-review?logo=npm)](https://www.npmjs.com/package/tux-review)
+[![PyPI](https://img.shields.io/pypi/v/tux-review?logo=pypi)](https://pypi.org/project/tux-review/)
 [![CI](https://github.com/sommelo1/tux/actions/workflows/ci.yml/badge.svg)](https://github.com/sommelo1/tux/actions/workflows/ci.yml)
 [![E2E](https://github.com/sommelo1/tux/actions/workflows/e2e.yml/badge.svg)](https://github.com/sommelo1/tux/actions/workflows/e2e.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -50,11 +50,11 @@ tux design    install | create | start-review | status | stop-review
 ```
 
 ```bash
-npx --yes --package=tux-uix tux design install --framework vanilla   # wire config + review
-npx --yes --package=tux-uix tux design create --framework vanilla --name checkout
-npx --yes --package=tux-uix tux design start-review                  # → http://127.0.0.1:4173
-npx --yes --package=tux-uix tux design status                        # running state + feedback count
-npx --yes --package=tux-uix tux design stop-review                   # end the session
+npx --yes --package=tux-review tux design install --framework vanilla   # wire config + review
+npx --yes --package=tux-review tux design create --framework vanilla --name checkout
+npx --yes --package=tux-review tux design start-review                  # → http://127.0.0.1:4173
+npx --yes --package=tux-review tux design status                        # running state + feedback count
+npx --yes --package=tux-review tux design stop-review                   # end the session
 ```
 
 ```mermaid
@@ -84,7 +84,7 @@ tux live      install | create | start-review | status | stop-review
 ```
 
 ```bash
-pipx install tux-uix
+pipx install tux-review
 tux live install                                   # detect setup, pick least-invasive strategy
 tux live start-review --url http://localhost:3000  # proxy + Review Client
 tux live status
@@ -149,8 +149,8 @@ everything back with `tux feedback show --format json` from that folder.
 
 ## Why TUX
 
-- **Two byte-identical engines.** `js/` (Node ≥ 20, npm `tux-uix`,
-  zero runtime dependencies) and `py/` (Python ≥ 3.10, PyPI `tux-uix`,
+- **Two byte-identical engines.** `js/` (Node ≥ 20, npm `tux-review`,
+  zero runtime dependencies) and `py/` (Python ≥ 3.10, PyPI `tux-review`,
   stdlib-only) agree byte-for-byte on every fixture in `conformance/`.
   The fixtures are the source of truth — neither implementation may
   drift.
@@ -175,8 +175,8 @@ everything back with `tux feedback show --format json` from that folder.
 
 | Engine | Requirement | Install | Entry point |
 |---|---|---|---|
-| Node | ≥ 20 | `npm install -g tux-uix` or `npx --yes --package=tux-uix tux …` | `tux` |
-| Python | ≥ 3.10, stdlib-only | `pipx install tux-uix` or `pip install tux-uix` | `tux` |
+| Node | ≥ 20 | `npm install -g tux-review` or `npx --yes --package=tux-review tux …` | `tux` |
+| Python | ≥ 3.10, stdlib-only | `pipx install tux-review` or `pip install tux-review` | `tux` |
 
 Both engines implement the identical CLI and the identical conformance
 contract — pick either, or use both (they write the same canonical store).

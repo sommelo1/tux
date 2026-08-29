@@ -34,11 +34,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Verify npm release visibility
         run: |
-          node -e "const {execFileSync}=require('node:child_process'); const fs=require('fs'); const v=JSON.parse(fs.readFileSync('js/package.json','utf8')).version; const out=execFileSync('npm',['view','tux-uix','version'],{encoding:'utf8'}).trim(); if (out !== v) { console.error('expected ' + v + ', got ' + out); process.exit(1); }"
+          node -e "const {execFileSync}=require('node:child_process'); const fs=require('fs'); const v=JSON.parse(fs.readFileSync('js/package.json','utf8')).version; const out=execFileSync('npm',['view','tux-review','version'],{encoding:'utf8'}).trim(); if (out !== v) { console.error('expected ' + v + ', got ' + out); process.exit(1); }"
 
   pypi:
     name: Publish to PyPI
     runs-on: ubuntu-latest
+    environment: pypi
     permissions:
       id-token: write
     steps:
@@ -62,11 +63,11 @@ jobs:
           python - <<'PY'
           import pathlib, re, sys, time, tomllib, urllib.request
           target = tomllib.loads((pathlib.Path("py") / "pyproject.toml").read_text())["project"]["version"]
-          url = "https://pypi.org/simple/tux-uix/"
+          url = "https://pypi.org/simple/tux-review/"
           for _ in range(30):
               text = urllib.request.urlopen(url, timeout=20).read().decode()
-              if re.search(rf"tux_uix-{re.escape(target)}(?:-py3-none-any)?\.(?:whl|tar\.gz)", text):
+              if re.search(rf"tux_review-{re.escape(target)}(?:-py3-none-any)?\.(?:whl|tar\.gz)", text):
                   sys.exit(0)
               time.sleep(10)
-          raise SystemExit(f"PyPI simple index did not expose tux-uix {target}")
+          raise SystemExit(f"PyPI simple index did not expose tux-review {target}")
           PY

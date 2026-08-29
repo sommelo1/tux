@@ -11,9 +11,9 @@ machine-readable feedback directly to pages, routes, components,
 component instances, elements, and UI states. Normative specification:
 `SPC.md`. Reference implementations:
 
-- `js/`  — Node ≥20, zero runtime dependencies, ESM, npm package `tux-uix`,
+- `js/`  — Node ≥20, zero runtime dependencies, ESM, npm package `tux-review`,
   binary `tux`, Review Client in `js/client/` (Plain JS ESM, no build)
-- `py/`  — Python ≥3.10, stdlib-only, PyPI package `tux-uix`,
+- `py/`  — Python ≥3.10, stdlib-only, PyPI package `tux-review`,
   console script `tux`, review/design server in `py/tux/server.py`
 
 Duality contract: both implementations MUST stay byte-identical on all

@@ -22,8 +22,8 @@ done
 menu() {
   echo
   echo " TUX Showcase — choose the engine that runs the review server:"
-  echo "   1  Node  (npm package tux-uix)"
-  echo "   2  Python (PyPI package tux-uix)"
+  echo "   1  Node  (npm package tux-review)"
+  echo "   2  Python (PyPI package tux-review)"
   printf " Choice [1]: "
   local ch
   read -r ch
@@ -44,18 +44,18 @@ resolve() {
     node)
       if command -v tux >/dev/null 2>&1; then TUX=(tux)
       elif [ -f "$REPO/js/bin/tux.js" ]; then TUX=(node "$REPO/js/bin/tux.js")
-      else TUX=(npx --yes --package=tux-uix tux); fi
+      else TUX=(npx --yes --package=tux-review tux); fi
       ;;
     python)
       if [ -x "$REPO/.venv/Scripts/python.exe" ]; then TUX=("$REPO/.venv/Scripts/python.exe" -m tux)
       elif [ -x "$REPO/.venv/bin/python" ]; then TUX=("$REPO/.venv/bin/python" -m tux)
       elif command -v tux >/dev/null 2>&1; then TUX=(tux)
-      else TUX=(pipx run tux-uix tux); fi
+      else TUX=(pipx run tux-review tux); fi
       ;;
     *)
       if command -v tux >/dev/null 2>&1; then TUX=(tux)
       elif [ -f "$REPO/js/bin/tux.js" ]; then TUX=(node "$REPO/js/bin/tux.js")
-      else TUX=(pipx run tux-uix tux); fi
+      else TUX=(pipx run tux-review tux); fi
       ;;
   esac
 }

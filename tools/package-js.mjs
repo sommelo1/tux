@@ -44,7 +44,7 @@ if (!pyproject.includes(`version = "${version}"`)) fail(`py/pyproject.toml versi
 if (!pyInit.includes(`__version__ = "${version}"`)) fail(`py/tux/__init__.py version does not match ${version}`);
 
 // ── pack ──
-rmSync(join(distDir, 'tux-uix'), { recursive: true, force: true });
+rmSync(join(distDir, 'tux-review'), { recursive: true, force: true });
 mkdirSync(distDir, { recursive: true });
 // npm packs the package dir (js/) — the repo-root README must ride along:
 const jsReadme = join(jsDir, 'README.md');

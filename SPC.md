@@ -2,7 +2,7 @@
 
 Normative specification of **TUX — TUX UIX Review System**. The running UI itself is the review artifact.
 
-The canonical implementations are `js/` (npm `tux-uix`, Node ≥ 20) and `py/` (PyPI `tux-uix`, Python ≥ 3.10, stdlib-only). The byte-identical behavior fixtures under `conformance/` are the source of truth for cross-runtime behavior.
+The canonical implementations are `js/` (npm `tux-review`, Node ≥ 20) and `py/` (PyPI `tux-review`, Python ≥ 3.10, stdlib-only). The byte-identical behavior fixtures under `conformance/` are the source of truth for cross-runtime behavior.
 
 The key words **MUST**, **SHOULD**, **MAY** are to be interpreted as described in [RFC 2119](https://www.rfc-editor.org/rfc/rfc2119).
 

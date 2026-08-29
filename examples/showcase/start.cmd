@@ -22,8 +22,8 @@ goto after_menu
 :menu
 echo.
 echo  TUX Showcase - choose the engine that runs the review server:
-echo    1  Node  (npm package tux-uix)
-echo    2  Python (PyPI package tux-uix)
+echo    1  Node  (npm package tux-review)
+echo    2  Python (PyPI package tux-review)
 set "CH="
 set /p "CH=Choice [1]: "
 if not defined CH set "CH=1"
@@ -70,7 +70,7 @@ if exist "%REPO%\js\bin\tux.js" (
   set "TUX=node "%REPO%\js\bin\tux.js""
   goto :eof
 )
-set "TUX=npx --yes --package=tux-uix tux"
+set "TUX=npx --yes --package=tux-review tux"
 goto :eof
 
 :resolve_python
@@ -83,7 +83,7 @@ if not errorlevel 1 (
   set "TUX=tux"
   goto :eof
 )
-set "TUX=pipx run tux-uix tux"
+set "TUX=pipx run tux-review tux"
 goto :eof
 
 :resolve_any
@@ -96,7 +96,7 @@ if exist "%REPO%\js\bin\tux.js" (
   set "TUX=node "%REPO%\js\bin\tux.js""
   goto :eof
 )
-set "TUX=pipx run tux-uix tux"
+set "TUX=pipx run tux-review tux"
 goto :eof
 
 :end
