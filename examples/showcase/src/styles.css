@@ -30,7 +30,9 @@ body {
 
 .nav a { color: var(--muted); text-decoration: none; font-weight: 600; font-size: 15px; }
 .nav a:hover { color: var(--text); }
-.nav .brand { color: var(--text); font-weight: 800; letter-spacing: 0.5px; }
+.nav .brand { font-weight: 800; letter-spacing: 0.5px; }
+.nav a.active { color: var(--text); }
+.nav a.active::after { content: ""; display: block; height: 2px; border-radius: 1px; background: var(--accent); margin-top: 2px; }
 
 main { max-width: 960px; margin: 0 auto; padding: 40px 24px 90px; }
 

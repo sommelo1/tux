@@ -100,6 +100,12 @@ function render() {
   else if (route === '/product/aurora-lamp') view.innerHTML = detailPage();
   else if (route === '/checkout') view.innerHTML = checkoutPage();
   else view.innerHTML = homePage();
+  document.querySelectorAll('.nav a').forEach((a) => {
+    const active = a.getAttribute('href') === route;
+    a.classList.toggle('active', active);
+    if (active) a.setAttribute('aria-current', 'page');
+    else a.removeAttribute('aria-current');
+  });
   bind();
 }
 

@@ -33,9 +33,10 @@ So the showcase works both inside this repository and standalone.
 - **Component vs. instance targeting** — the product grid has three
   `ProductCard` instances; feedback on one never appears on another.
 - **Tab state** — feedback on the Specs tab of the detail page.
-- **Modal ui_state** — open the coupon modal on Checkout, click any
-  element inside it and leave feedback: the item records the open modal
-  as `ui_state`.
+- **Modal ui_state** — on Checkout, open the coupon modal first, then
+  activate commenting (the launcher stays clickable above the modal
+  backdrop), click any element inside the dialog and leave feedback: the
+  item records the open modal as `ui_state`.
 - **Machine interface** — the seed and everything you add is readable
   with `tux feedback show --format json` (run it from this directory).
 
