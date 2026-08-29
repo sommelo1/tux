@@ -1,8 +1,12 @@
-/* TUX Review Client styles — scoped under #tux-root + .tux-* classes.
- * Themeable via --tux-* tokens; host values win (Application Isolation,
- * SPC section 61). No global element selectors are touched. */
+/* TUX Review Client styles — tux-owned classes only; host element
+ * selectors are never touched (Application Isolation, SPC section 61).
+ * Themeable via --tux-* tokens; values reference host variables, so host
+ * values win. Tokens live on :root because tux surfaces render in three
+ * places: the overlay (#tux-root), the top-layer dialog (portaled editor,
+ * markers, reparented float/sidebar/toast), and — for the hover outline —
+ * directly on host elements. */
 
-#tux-root {
+:root {
   --tux-primary: var(--primary, #569cd6);
   --tux-surface: var(--card-bg, #fff);
   --tux-surface2: var(--chip-bg, #f0f2f5);
@@ -15,6 +19,9 @@
   --tux-yellow: #f9a825;
   --tux-radius: 12px;
   --tux-shadow: 0 4px 16px rgba(0, 0, 0, .16);
+}
+
+#tux-root {
   font-family: system-ui, sans-serif;
   font-size: 14px;
   color: var(--tux-text);
@@ -22,20 +29,11 @@
 
 /* Floating activation surface (launcher + state label). While a native
    <dialog> is open, the client reparents this element into the dialog so
-   it stays clickable above the backdrop — the tokens are declared here so
-   they apply in both parents. */
+   it stays clickable above the backdrop. */
 #tux-root .tux-float,
 dialog[open] .tux-float {
   position: fixed; right: 14px; bottom: 14px; z-index: 2147483000;
   display: flex; align-items: center; gap: 10px;
-  --tux-primary: var(--primary, #569cd6);
-  --tux-surface: var(--card-bg, #fff);
-  --tux-surface2: var(--chip-bg, #f0f2f5);
-  --tux-border: var(--card-border, rgba(0, 0, 0, .12));
-  --tux-text: var(--on-surface, #1e1e1e);
-  --tux-muted: var(--outline, #6e6e6e);
-  --tux-rec: #e53935;
-  --tux-shadow: 0 4px 16px rgba(0, 0, 0, .16);
   font-family: system-ui, sans-serif;
   font-size: 14px;
   color: var(--tux-text);
@@ -83,30 +81,14 @@ dialog[open] .tux-float {
   animation: tux-invite-pulse 2s ease-in-out infinite;
 }
 
-/* Markers and the editor portal into native dialogs when the target lives
-   in the top layer — the dialog[open] alternative keeps them styled there.
-   Tokens are re-declared on dialog[open] because portaled overlay UI does
-   not inherit them from #tux-root; only --tux-* tokens are touched, host
-   content is never restyled (Application Isolation, SPC section 61). */
-dialog[open] {
-  --tux-primary: var(--primary, #569cd6);
-  --tux-surface: var(--card-bg, #fff);
-  --tux-surface2: var(--chip-bg, #f0f2f5);
-  --tux-border: var(--card-border, rgba(0, 0, 0, .12));
-  --tux-text: var(--on-surface, #1e1e1e);
-  --tux-muted: var(--outline, #6e6e6e);
-  --tux-danger: #c62828;
-  --tux-rec: #e53935;
-  --tux-green: #2e7d32;
-  --tux-yellow: #f9a825;
-  --tux-radius: 12px;
-  --tux-shadow: 0 4px 16px rgba(0, 0, 0, .16);
-}
-:is(#tux-root, dialog[open]) .tux-hover { outline: 2px dashed var(--tux-primary) !important; outline-offset: -2px; }
-
 body.tux-mode * { cursor: crosshair !important; }
 
 #tux-root .tux-layer { position: absolute; left: 0; top: 0; }
+
+/* Hover outline — lands on host elements, so this rule is intentionally
+   unscoped: the class name is tux-owned and the outline must work both on
+   plain page elements and inside top-layer dialogs. */
+.tux-hover { outline: 2px dashed var(--tux-primary) !important; outline-offset: -2px; }
 
 /* Markers and the editor portal into native dialogs when the target lives
    in the top layer — the dialog[open] alternative keeps them styled there. */

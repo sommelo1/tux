@@ -156,6 +156,33 @@ test('editor and markers render styled inside native dialogs (SPC 11, 12)', asyn
   expect(mStyle.pos).toBe('fixed');
 });
 
+test('hover outline highlights host elements and dialog elements (SPC 12)', async ({ page }) => {
+  await page.goto('/checkout');
+  await expect.poll(() => page.evaluate(() => window.__TUX_READY__ ?? false)).toBe(true);
+  await page.click('[data-tux-launcher]'); // commenting on
+
+  // host element outside any tux container
+  await page.hover('[data-tux-id="checkout-submit"]');
+  const outside = await page.evaluate(() => {
+    const el = document.querySelector('[data-tux-id="checkout-submit"]');
+    return { has: el.classList.contains('tux-hover'), style: getComputedStyle(el).outlineStyle };
+  });
+  expect(outside.has).toBe(true);
+  expect(outside.style).toBe('dashed');
+
+  // inside the modal dialog: off → open → on, then hover dialog content
+  await page.click('[data-tux-launcher]');
+  await page.click('[data-tux-id="coupon-open"]');
+  await page.click('[data-tux-launcher]');
+  await page.hover('[data-tux-id="coupon-input"]');
+  const inside = await page.evaluate(() => {
+    const el = document.querySelector('[data-tux-id="coupon-input"]');
+    return { has: el.classList.contains('tux-hover'), style: getComputedStyle(el).outlineStyle };
+  });
+  expect(inside.has).toBe(true);
+  expect(inside.style).toBe('dashed');
+});
+
 test('URL override ?tux=off disables, ?tux=on re-enables (SPC 66–68)', async ({ page }) => {
   await page.goto('/?tux=off');
   await expect(page.locator('[data-tux-launcher]')).toHaveCount(0);
