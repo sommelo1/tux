@@ -86,7 +86,7 @@ async function stopServer(child) {
 }
 
 async function serveAndVerify(cli, serveDir, port, cwd, marker, label) {
-  const child = spawn(process.execPath, [cli, 'design', 'serve', '--dir', serveDir, '--port', String(port)], {
+  const child = spawn(process.execPath, [cli, 'design', 'start-review', '--dir', serveDir, '--port', String(port), '--foreground'], {
     cwd, stdio: 'ignore',
   });
   let exited = null;
@@ -196,7 +196,7 @@ try {
   // framework serving incl. real builds is covered by the npm-package section above)
   run(venvTux, ['design', 'create', '--framework', 'vanilla', '--name', 'vanilla-demo'], pyEnv);
   const pyServeDir = join(pyEnv, 'requirements', 'vanilla-demo', 'design');
-  const pyChild = spawn(venvTux, ['design', 'serve', '--dir', pyServeDir, '--port', '4320'], { cwd: pyEnv, stdio: 'ignore' });
+  const pyChild = spawn(venvTux, ['design', 'start-review', '--dir', pyServeDir, '--port', '4320', '--foreground'], { cwd: pyEnv, stdio: 'ignore' });
   try {
     await waitFor('http://127.0.0.1:4320/api/tux/health');
     const page = await (await fetch('http://127.0.0.1:4320/')).text();
