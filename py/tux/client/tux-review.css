@@ -87,8 +87,9 @@ body.tux-mode * { cursor: crosshair !important; }
 
 /* Hover outline — lands on host elements, so this rule is intentionally
    unscoped: the class name is tux-owned and the outline must work both on
-   plain page elements and inside top-layer dialogs. */
-.tux-hover { outline: 2px dashed var(--tux-primary) !important; outline-offset: -2px; }
+   plain page elements and inside top-layer dialogs. .tux-editing marks the
+   target of the currently open editor with the same outline. */
+.tux-hover, .tux-editing { outline: 2px dashed var(--tux-primary) !important; outline-offset: -2px; }
 
 /* Markers and the editor portal into native dialogs when the target lives
    in the top layer — the dialog[open] alternative keeps them styled there. */

@@ -359,6 +359,7 @@
     return target.closest('dialog[open], [role="dialog"][aria-modal="true"]') || root().querySelector('[data-tux-layer]');
   }
   function closeEditor() {
+    document.querySelectorAll('.tux-editing').forEach((n) => n.classList.remove('tux-editing'));
     const layer = root() && root().querySelector('[data-tux-layer]');
     if (layer) layer.querySelectorAll('.tux-editor').forEach((n) => n.remove());
     document.querySelectorAll('dialog[open] .tux-editor, [role="dialog"] .tux-editor').forEach((n) => n.remove());
@@ -367,6 +368,9 @@
   function openEditor(state) {
     closeEditor();
     editorState = state;
+    // keep the edit target visually marked for as long as its editor is
+    // open — same treatment as the hover outline
+    if (state.mode === 'edit' && state.el) state.el.classList.add('tux-editing');
     const host = overlayHostFor(state.el);
     const inTopLayer = host !== root().querySelector('[data-tux-layer]');
     const rect = state.el.getBoundingClientRect();

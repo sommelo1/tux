@@ -81,6 +81,15 @@ test('edit and delete own feedback via marker flyout', async ({ page }) => {
   await expect(page.locator('.tux-editor')).toHaveCount(0);
   await expect(page.locator('.tux-marker')).toHaveCount(1);
 
+  // re-edit: the target element stays outlined while its editor is open
+  await page.locator('.tux-marker').click();
+  await expect(page.locator('.tux-editor')).toBeVisible();
+  await expect(page.locator('.tux-editing')).toHaveCount(1);
+  const editingTarget = await page.evaluate(() => document.querySelector('.tux-editing')?.getAttribute('data-tux-id'));
+  expect(editingTarget).toBe('product-price-p1');
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.locator('.tux-editing')).toHaveCount(0);
+
   // edit
   await page.locator('.tux-marker').first().click();
   await expect(page.locator('.tux-editor')).toBeVisible();
