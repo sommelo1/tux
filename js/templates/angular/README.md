@@ -1,7 +1,19 @@
 # checkout (angular design)
 
+This design itself uses npm. Choose one TUX CLI: Node users run
+`npm install --save-dev tux-review` then `npx tux …`; Python users install
+`tux-review` with `pipx` or `pip` then run `tux …`. The TUX commands below are
+otherwise identical.
+
 ```bash
 npm install
-tux design start-review --foreground --dir .  # serves the built design (npm run build first)
-# or: npm start + tux live start-review --url http://localhost:4200
+npm run build
+
+# Node.js/npm TUX variant — serves the built design with TUX review
+npx tux design start-review --foreground --dir .
+
+# Python/PyPI TUX variant — same command after Python installation
+tux design start-review --foreground --dir .
+
+# Alternative for either variant: npm start + <tux command> live start-review --url http://localhost:4200
 ```

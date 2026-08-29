@@ -49,12 +49,15 @@ validation verifies every change in the running mockup.
 tux design    install | create | start-review | status | stop-review
 ```
 
+All examples below use `tux` after you have chosen and installed one CLI
+variant in [Installation](#installation).
+
 ```bash
-npx --yes --package=tux-review tux design install --framework vanilla   # wire config + review
-npx --yes --package=tux-review tux design create --framework vanilla --name checkout
-npx --yes --package=tux-review tux design start-review                  # → http://127.0.0.1:4173
-npx --yes --package=tux-review tux design status                        # running state + feedback count
-npx --yes --package=tux-review tux design stop-review                   # end the session
+tux design install --framework vanilla   # wire config + review
+tux design create --framework vanilla --name checkout
+tux design start-review                  # → http://127.0.0.1:4173
+tux design status                        # running state + feedback count
+tux design stop-review                   # end the session
 ```
 
 ```mermaid
@@ -173,13 +176,46 @@ everything back with `tux feedback show --format json` from that folder.
 
 ## Installation
 
-| Engine | Requirement | Install | Entry point |
-|---|---|---|---|
-| Node | ≥ 20 | `npm install -g tux-review` or `npx --yes --package=tux-review tux …` | `tux` |
-| Python | ≥ 3.10, stdlib-only | `pipx install tux-review` or `pip install tux-review` | `tux` |
+Choose **one** variant. They expose the same `tux` commands and write the
+same canonical `.tux/` store; installing both is unnecessary. Pick Node when
+you already work in an npm/JavaScript project or need the JavaScript package
+export (`tux-review/client`). Pick Python when you prefer a standalone,
+stdlib-only CLI and server.
 
-Both engines implement the identical CLI and the identical conformance
-contract — pick either, or use both (they write the same canonical store).
+### Node.js / npm package
+
+Requires Node.js 20 or newer. Install in the project so that its version is
+recorded with the project:
+
+```bash
+npm install --save-dev tux-review
+npx tux --version
+```
+
+For a one-off command without installation, use:
+
+```bash
+npx --yes --package=tux-review tux --version
+```
+
+### Python / PyPI package
+
+Requires Python 3.10 or newer. Use `pipx` for an isolated command-line tool,
+or install into your project's active virtual environment:
+
+```bash
+pipx install tux-review
+tux --version
+```
+
+```bash
+python -m pip install tux-review
+tux --version
+```
+
+From this point on, every example uses the same command form: `tux …`.
+Only the installation mechanism differs; CLI behavior and JSON output are
+byte-identical across Node and Python.
 
 ## Usage
 

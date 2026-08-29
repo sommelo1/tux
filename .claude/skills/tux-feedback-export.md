@@ -10,15 +10,20 @@ Export feedback as a file or stream, serialized without interpretation
 
 ## Resolve the CLI
 
-TUX must exist as a deterministic CLI. Resolve it in this order and stop
-at the first hit:
+Choose one TUX CLI variant; both implement the same commands and canonical
+JSON output, so do not install both:
 
-1. `tux --version` on PATH → use it.
-2. `npx --yes --package=tux-review tux --version` → use `npx --yes --package=tux-review tux …`.
-3. `pipx run tux-review tux --version` → prefix every command with `pipx run tux-review`.
+1. **Node.js/npm** — use an existing `tux --version` on PATH, or run
+   `npx --yes --package=tux-review tux --version` and prefix commands with
+   `npx --yes --package=tux-review tux …`.
+2. **Python/PyPI** — install with `pipx install tux-review` (or
+   `python -m pip install tux-review` in the active virtual environment),
+   then use `tux --version`. For a one-off run, use
+   `pipx run tux-review tux --version`.
 
-All commands below are written as `tux <domain> <action>`; apply the
-resolved prefix.
+All commands below use the neutral form `tux <domain> <action>`. Replace
+`tux` with the Node `npx … tux` prefix only when you chose the Node
+one-off variant.
 
 ## Workflow
 

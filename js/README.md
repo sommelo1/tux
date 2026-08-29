@@ -4,9 +4,14 @@ TUX turns a running web UI into a review artifact. Reviewers can attach
 structured, machine-readable feedback to pages, routes, components, element
 instances, and UI states directly in the browser.
 
-The package includes the `tux` CLI, a local review server, framework
-templates, and the framework-agnostic Review Client. It has no runtime
-dependencies and requires Node.js 20 or newer.
+This is the **Node.js/npm variant** of TUX. It includes the `tux` CLI, a
+local review server, framework templates, and the framework-agnostic Review
+Client. It has no runtime dependencies and requires Node.js 20 or newer.
+
+Choose this package if your project uses npm/JavaScript or you need the
+`tux-review/client` JavaScript export. If you only want a stdlib-only CLI and
+server, install the separate but command-compatible Python package from PyPI
+instead. Do not install both for one project.
 
 ## Install
 
@@ -16,28 +21,29 @@ Run the CLI without a global installation:
 npx --yes --package=tux-review tux --help
 ```
 
-Or install it in a project:
+Or install it in the project (recommended):
 
 ```bash
 npm install --save-dev tux-review
-npx tux design install --framework vanilla
+npx tux --version
 ```
 
 ## Typical workflow
 
-For a clickable design, install TUX, create a design, then start a review:
+After installation, run every CLI command through `npx tux …` (or `tux …` if
+you installed it globally). For a clickable design:
 
 ```bash
-tux design install --framework vanilla
-tux design create --framework vanilla --name checkout
-tux design start-review
+npx tux design install --framework vanilla
+npx tux design create --framework vanilla --name checkout
+npx tux design start-review
 ```
 
 For an existing application, use the live-review workflow:
 
 ```bash
-tux live install
-tux live start-review --url http://localhost:3000
+npx tux live install
+npx tux live start-review --url http://localhost:3000
 ```
 
 Feedback is stored in `.tux/feedback.json` by default and can be inspected or
