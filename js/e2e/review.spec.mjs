@@ -100,6 +100,54 @@ test('edit and delete own feedback via marker flyout', async ({ page }) => {
   expect(after).toHaveLength(0);
 });
 
+test('editor and markers render styled inside native dialogs (SPC 11, 12)', async ({ page }) => {
+  tux('feedback clear --all --force');
+  await page.goto('/checkout');
+  await expect.poll(() => page.evaluate(() => window.__TUX_READY__ ?? false)).toBe(true);
+
+  // open the modal while commenting is off, then activate commenting:
+  // the launcher must stay clickable above the modal backdrop
+  await page.click('[data-tux-id="coupon-open"]');
+  await page.click('[data-tux-launcher]');
+  await expect.poll(() => page.evaluate(() => window.TUXReview.mode)).toBe(true);
+
+  // the editor portals into the dialog and must arrive styled, not as
+  // unstyled DOM (it lives outside #tux-root when portaled)
+  await page.click('[data-tux-id="coupon-input"]');
+  const editor = page.locator('#coupon-modal .tux-editor.tux-open');
+  await expect(editor).toBeVisible();
+  const style = await editor.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    return {
+      position: cs.position, width: cs.width, radius: cs.borderTopLeftRadius,
+      bg: cs.backgroundColor, border: cs.borderTopWidth, z: cs.zIndex,
+      inViewport: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight,
+    };
+  });
+  expect(style.position).toBe('fixed');
+  expect(style.width).toBe('300px');
+  expect(style.radius).toBe('12px');
+  expect(style.bg).toBe('rgb(255, 255, 255)');
+  expect(style.border).toBe('1px');
+  expect(style.z).toBe('2147483002');
+  expect(style.inViewport).toBe(true);
+
+  // save → the marker lands inside the dialog, styled as well
+  await editor.locator('[data-ed-text]').fill('Styled inside the dialog');
+  await editor.locator('[data-act="save"]').click();
+  const marker = page.locator('#coupon-modal .tux-marker');
+  await expect(marker).toHaveCount(1);
+  const mStyle = await marker.evaluate((el) => {
+    const cs = getComputedStyle(el);
+    return { height: cs.height, radius: cs.borderRadius, bg: cs.backgroundColor, pos: cs.position };
+  });
+  expect(mStyle.height).toBe('22px');
+  expect(mStyle.radius).toBe('11px');
+  expect(mStyle.bg).toBe('rgb(249, 168, 37)');
+  expect(mStyle.pos).toBe('fixed');
+});
+
 test('URL override ?tux=off disables, ?tux=on re-enables (SPC 66–68)', async ({ page }) => {
   await page.goto('/?tux=off');
   await expect(page.locator('[data-tux-launcher]')).toHaveCount(0);
