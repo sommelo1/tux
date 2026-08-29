@@ -1868,7 +1868,7 @@ Diagnostics belong on stderr.
 
 ## 75. Exit Codes
 
-Initial recommended classes:
+Frozen numeric contract:
 
 ```text
 0 success
@@ -1880,8 +1880,6 @@ Initial recommended classes:
 6 entity not found
 7 conflict
 ```
-
-The final numeric contract must be frozen before release.
 
 ## 76. Configuration
 
