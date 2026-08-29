@@ -7,7 +7,7 @@
  * are complete and runnable, not merely that the sources work:
  *
  * 1. npm: fresh project dir → `npm install <tarball>` → CLI round-trip
- *    (--version, feedback create/list, design create for ALL frameworks,
+ *    (--version, feedback create/show, design create for ALL frameworks,
  *    skills + client files present in node_modules).
  * 2. Frameworks: for vanilla, react, vue and angular a dedicated env
  *    materializes the scaffold via the installed CLI; react/vue/angular
@@ -127,8 +127,8 @@ try {
   check(run('node', [cli, '--version'], npmEnv) === `tux ${version}`, `npm: tux --version → tux ${version}`);
 
   run('node', [cli, 'feedback', 'create', '--type', 'issue', '--text', 'from installed package'], npmEnv);
-  const listed = JSON.parse(run('node', [cli, 'feedback', 'list', '--format', 'json'], npmEnv));
-  check(listed.length === 1 && listed[0].feedback.text === 'from installed package', 'npm: feedback create/list round-trip');
+  const listed = JSON.parse(run('node', [cli, 'feedback', 'show', '--format', 'json'], npmEnv));
+  check(listed.length === 1 && listed[0].feedback.text === 'from installed package', 'npm: feedback create/show round-trip');
 
   const scaffoldMarker = {
     vanilla: 'src/app.js',
@@ -144,7 +144,7 @@ try {
   }
   const pkgRoot = join(npmEnv, 'node_modules', 'tux-review');
   const skillCount = readdirSync(join(pkgRoot, 'skills')).filter((f) => f.endsWith('.md')).length;
-  check(skillCount === 7, `npm: 7 skills shipped (found ${skillCount})`);
+  check(skillCount === 13, `npm: 13 skills shipped (found ${skillCount})`);
   check(existsSync(join(pkgRoot, 'client', 'tux-review.js')), 'npm: review client shipped');
 
   // ── 2) frameworks: dedicated env per framework, real install + build + serve ──
@@ -185,8 +185,8 @@ try {
   check(run(venvTux, ['--version'], pyEnv) === `tux ${version}`, `py: console script tux --version → tux ${version}`);
 
   run(venvTux, ['feedback', 'create', '--type', 'issue', '--text', 'from installed wheel'], pyEnv);
-  const pyListed = JSON.parse(run(venvTux, ['feedback', 'list', '--format', 'json'], pyEnv));
-  check(pyListed.length === 1 && pyListed[0].feedback.text === 'from installed wheel', 'py: feedback create/list round-trip');
+  const pyListed = JSON.parse(run(venvTux, ['feedback', 'show', '--format', 'json'], pyEnv));
+  check(pyListed.length === 1 && pyListed[0].feedback.text === 'from installed wheel', 'py: feedback create/show round-trip');
 
   run(venvTux, ['design', 'create', '--framework', 'angular', '--name', 'demo'], pyEnv);
   check(existsSync(join(pyEnv, 'requirements', 'demo', 'design', 'src', 'app', 'app.component.ts')),
