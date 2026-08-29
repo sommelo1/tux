@@ -219,7 +219,8 @@
 
   function buildShell() {
     ensureRoot().innerHTML = `
-      <button class="tux-launcher" data-tux-launcher data-tux-ui title="TUX review">⬢</button>
+      <button class="tux-launcher" data-tux-launcher data-tux-ui>⬢</button>
+      <span class="tux-launcher-hint" data-tux-hint data-tux-ui></span>
       <aside class="tux-sidebar" data-tux-sidebar data-tux-ui>
         <div class="tux-sb-head"><span>TUX Review</span><button class="tux-sb-close" data-tux-sb-close>✕</button></div>
         <div class="tux-sb-meta" data-tux-sb-meta></div>
@@ -239,6 +240,30 @@
     });
   }
 
+  // Launcher state: boot invite → persistent "commenting on/off" label
+  // plus a hover tooltip on the collapsed button.
+  let interacted = false;
+  function updateLauncherHint() {
+    const launcher = root().querySelector('[data-tux-launcher]');
+    const hint = root().querySelector('[data-tux-hint]');
+    if (!launcher || !hint) return;
+    let text;
+    if (!interacted) {
+      text = 'To activate TUX review, click here';
+      hint.className = 'tux-launcher-hint tux-hint-invite';
+      launcher.classList.add('tux-invite');
+    } else if (mode) {
+      text = 'Commenting on';
+      hint.className = 'tux-launcher-hint tux-hint-on';
+      launcher.classList.remove('tux-invite');
+    } else {
+      text = 'Commenting off';
+      hint.className = 'tux-launcher-hint tux-hint-off';
+      launcher.classList.remove('tux-invite');
+    }
+    hint.textContent = text;
+  }
+
   function toast(msg) {
     const t = root().querySelector('[data-tux-toast]');
     if (!t) return;
@@ -252,6 +277,8 @@
     mode = !!v;
     document.body.classList.toggle('tux-mode', mode);
     root().querySelector('[data-tux-launcher]').classList.toggle('tux-active', mode);
+    if (!interacted) interacted = true;
+    updateLauncherHint();
     if (mode) {
       openSidebar();
       toast('Review mode on — click an element');
@@ -492,6 +519,7 @@
     if (!resolveEnabled()) return; // ?tux=off or config disabled → stay inert (SPC 66–68)
     ensureStyles();
     buildShell();
+    updateLauncherHint();
     document.addEventListener('mouseover', onMouseOver, true);
     document.addEventListener('click', onClick, true);
     trackRoute(() => { refresh(); });

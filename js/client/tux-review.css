@@ -10,6 +10,7 @@
   --tux-text: var(--on-surface, #1e1e1e);
   --tux-muted: var(--outline, #6e6e6e);
   --tux-danger: #c62828;
+  --tux-rec: #e53935;
   --tux-green: #2e7d32;
   --tux-yellow: #f9a825;
   --tux-radius: 12px;
@@ -19,14 +20,49 @@
   color: var(--tux-text);
 }
 
+/* Launcher: light gray when off, recording red (pulsing) when commenting. */
 #tux-root .tux-launcher {
   position: fixed; right: 14px; bottom: 14px; z-index: 2147483000;
   width: 44px; height: 44px; border-radius: 50%;
   border: 1px solid var(--tux-border); cursor: pointer;
-  background: var(--tux-surface); color: var(--tux-primary);
+  background: var(--tux-surface2); color: var(--tux-muted);
   font-size: 20px; box-shadow: var(--tux-shadow);
 }
-#tux-root .tux-launcher.tux-active { background: var(--tux-primary); color: #fff; }
+#tux-root .tux-launcher.tux-active {
+  background: var(--tux-rec); color: #fff; border-color: var(--tux-rec);
+  animation: tux-rec-pulse 1.6s ease-out infinite;
+}
+#tux-root .tux-launcher.tux-invite {
+  animation: tux-invite-pulse 2s ease-in-out infinite;
+}
+@keyframes tux-rec-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, .45), var(--tux-shadow); }
+  70% { box-shadow: 0 0 0 14px rgba(229, 57, 53, 0), var(--tux-shadow); }
+  100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0), var(--tux-shadow); }
+}
+@keyframes tux-invite-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(86, 156, 214, .40), var(--tux-shadow); }
+  50% { box-shadow: 0 0 0 12px rgba(86, 156, 214, 0), var(--tux-shadow); }
+}
+
+/* Persistent state label next to the launcher. */
+#tux-root .tux-launcher-hint {
+  position: fixed; right: 68px; bottom: 14px; z-index: 2147483000;
+  height: 44px; display: flex; align-items: center;
+  padding: 0 14px; border-radius: 999px;
+  background: var(--tux-surface); border: 1px solid var(--tux-border);
+  box-shadow: var(--tux-shadow); color: var(--tux-text);
+  font-size: 12.5px; font-weight: 600; white-space: nowrap;
+}
+#tux-root .tux-launcher-hint::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--tux-muted); margin-right: 8px; flex: none;
+}
+#tux-root .tux-launcher-hint.tux-hint-on::before { background: var(--tux-rec); }
+#tux-root .tux-launcher-hint.tux-hint-invite::before {
+  background: var(--tux-primary);
+  animation: tux-invite-pulse 2s ease-in-out infinite;
+}
 
 body.tux-mode * { cursor: crosshair !important; }
 #tux-root .tux-hover { outline: 2px dashed var(--tux-primary) !important; outline-offset: -2px; }
