@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tux-review"
-version = "0.1.3"
+version = "0.1.4"
 description = "TUX - TUX UIX review system: attach structured, machine-readable feedback directly to running web UIs (pages, routes, components, elements, states) with a deterministic CLI, canonical JSON and LLM-friendly skills."
 readme = "README.md"
 license = "MIT"

@@ -122,3 +122,60 @@ def test_review_start_dry_run(tmp_path: Path):
     assert plan["mode"] == "proxy"
     assert plan["target"] == "http://localhost:3000"
     assert not (tmp_path / ".tux" / "server.json").exists()
+
+
+def test_proxy_forwards_target_errors_as_is(app_server, tmp_path: Path):
+    """Target 4xx/5xx are valid responses - forwarded with client injection
+    (only transport failures become 502). Py engine matches the JS engine
+    (fetch-based), SPC transparency."""
+    work = tmp_path
+    port = 4189
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def do_GET(self):
+            if self.path.startswith("/missing"):
+                body = b'<!doctype html><html><head><title>Oops</title></head><body><h1 id="e">Missing</h1></body></html>'
+                self.send_response(404)
+            else:
+                body = b'<!doctype html><html><head><title>App</title></head><body><h1 id="h">App</h1></body></html>'
+                self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    target = f"http://127.0.0.1:{srv.server_address[1]}"
+
+    config = {
+        "project_id": "proxy-err-test",
+        "review": {"enabled": True, "store": ".tux/feedback.json", "host": "127.0.0.1", "port": port},
+    }
+    (work / "tux.config.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+    started = tux(["live", "start-review", "--url", target, "--port", str(port)], work)
+    assert started.returncode == 0, started.stderr
+    try:
+        wait_for(f"http://127.0.0.1:{port}/api/tux/health")
+
+        # 200 page: injected as usual
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/") as r:
+            html = r.read().decode("utf-8")
+        assert "/__tux__/bootstrap.js" in html
+
+        # 404 page: forwarded as 404 (NOT 502) and still carries the client
+        raised = False
+        try:
+            urllib.request.urlopen(f"http://127.0.0.1:{port}/missing-page")
+        except urllib.error.HTTPError as e:
+            raised = True
+            assert e.code == 404, f"expected passthrough 404, got {e.code}"
+            html = e.read().decode("utf-8")
+            assert "/__tux__/bootstrap.js" in html
+        assert raised, "target 404 must pass through as HTTPError"
+    finally:
+        tux(["live", "stop-review"], work)

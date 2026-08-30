@@ -301,3 +301,35 @@ test('markers re-anchor after layout changes and follow dialog visibility (SPC 6
   await expect(page.locator('.tux-marker')).toHaveCount(1);
   await expect(page.locator('.tux-marker')).toBeHidden(); // modal closed after reload
 });
+
+test('restored dialog marker re-parents into the dialog when it opens (SPC 12, 60)', async ({ page }) => {
+  tux('feedback clear --all --force');
+  await page.goto('/checkout');
+  await page.click('[data-tux-launcher]'); // mode on
+  await page.click('[data-tux-launcher]'); // mode off, so the app button works
+  await page.click('[data-tux-id="coupon-open"]');
+  await page.keyboard.press('Alt+t');
+  await page.click('[data-tux-id="coupon-input"]');
+  await page.locator('[data-ed-text]').fill('Restore re-parent check');
+  await page.locator('[data-act="save"]').click();
+  await expect(page.locator('#coupon-modal .tux-marker')).toHaveCount(1);
+
+  // close the dialog, then reload: the pin restores while the dialog is
+  // closed (page layer, hidden) and must re-parent into the dialog top
+  // layer when the dialog opens again — not stay covered by the backdrop
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#coupon-modal')).not.toBeVisible();
+  await page.reload();
+  await expect(page.locator('.tux-marker')).toHaveCount(1);
+  await expect(page.locator('.tux-marker')).toBeHidden();
+
+  await page.click('[data-tux-id="coupon-open"]');
+  await expect(page.locator('#coupon-modal')).toBeVisible();
+  const marker = page.locator('#coupon-modal .tux-marker');
+  await expect(marker).toHaveCount(1);
+  await expect(marker).toBeVisible();
+  const tb = await page.locator('[data-tux-id="coupon-input"]').boundingBox();
+  const mb = await marker.boundingBox();
+  expect(Math.abs(mb.x - (tb.x + tb.width - 12))).toBeLessThan(40);
+  expect(Math.abs(mb.y - Math.max(0, tb.y - 8))).toBeLessThan(40);
+});

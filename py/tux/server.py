@@ -12,6 +12,7 @@ data (canonical JSON, same bootstrap literal).
 from __future__ import annotations
 
 import json
+import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -283,6 +284,14 @@ def _proxy(state, handler):
             payload = up.read()
             status = up.status
             headers = dict(up.headers)
+    except urllib.error.HTTPError as e:
+        # 4xx/5xx from the target are valid responses — forward them as-is
+        # (SPC: the proxy is transparent; only transport failures are 502).
+        # The JS engine (fetch-based) already behaves this way.
+        ctype = e.headers.get("Content-Type") or ""
+        payload = e.read()
+        status = e.code
+        headers = dict(e.headers)
     except Exception as exc:
         return _send_json(handler, 502, {"error": {"code": "bad_gateway", "message": f"target unreachable: {exc}"}})
     if ctype.startswith("text/html"):

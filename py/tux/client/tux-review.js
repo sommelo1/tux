@@ -561,11 +561,24 @@
   // resize/scroll/DOM mutations (rAF-throttled) so markers follow layout
   // changes: splitter drag, carousel transforms, dialogs opening and
   // closing, route-level reflows. Invisible targets hide their pin and
-  // reveal it again when the element becomes visible (SPC 60).
+  // reveal it again when the element becomes visible (SPC 60). The
+  // overlay host is recomputed on every pass, so a pin restored while
+  // its dialog is closed re-parents into the dialog the moment it opens
+  // (and back out when it closes) — otherwise it would stay parked in
+  // the page layer, covered by the dialog backdrop.
   let pinRegistry = [];
   function positionPins() {
+    const layer = root() ? root().querySelector('[data-tux-layer]') : null;
     for (const entry of pinRegistry) {
-      const { pin, target, inTopLayer } = entry;
+      const { pin, target } = entry;
+      const host = overlayHostFor(target);
+      if (pin.parentElement !== host) {
+        host.appendChild(pin);
+        entry.inTopLayer = host !== layer;
+        pin.style.position = entry.inTopLayer ? 'fixed' : '';
+        entry.lastKey = '';
+      }
+      const inTopLayer = entry.inTopLayer;
       const rects = target.getClientRects();
       const rect = target.getBoundingClientRect();
       const visible = rects.length > 0 && rect.width > 0 && rect.height > 0;
