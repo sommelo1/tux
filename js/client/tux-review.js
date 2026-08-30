@@ -139,16 +139,44 @@
       const el = document.querySelector(`[data-testid="${cssEscape(target.test_id)}"], [data-test-id="${cssEscape(target.test_id)}"]`);
       if (el) return el;
     }
+    // Fingerprint validation: when a resolution strategy yields several
+    // candidates (nth-child paths drift after DOM changes), pick the one
+    // that best matches the stored fingerprint — component/instance scope,
+    // captured text, role. Score 0 keeps the first candidate (SPC 16).
+    function scoreCandidate(el) {
+      let score = 0;
+      if (target.component && el.closest(`[data-tux-component="${cssEscape(target.component)}"]`)) score += 4;
+      if (target.component_instance && el.closest(`[data-tux-instance="${cssEscape(target.component_instance)}"]`)) score += 3;
+      if (target.text) {
+        const t = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+        if (t === target.text) score += 2;
+        else if (target.text.length > 12 && t.includes(target.text.slice(0, 40))) score += 1;
+      }
+      if (target.role && el.getAttribute('role') === target.role) score += 1;
+      return score;
+    }
+    function pickBest(nodes) {
+      let best = null, bestScore = -1;
+      for (const n of nodes) {
+        const s = scoreCandidate(n);
+        if (s > bestScore) { bestScore = s; best = n; }
+      }
+      return best;
+    }
     if (target.css_selector) {
       try {
-        const el = document.querySelector(target.css_selector);
-        if (el) return el;
+        const nodes = document.querySelectorAll(target.css_selector);
+        if (nodes.length) return pickBest(nodes);
       } catch (e) { /* invalid selector */ }
     }
     if (target.dom_path) {
       try {
-        const el = document.evaluate(target.dom_path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        if (el) return el;
+        const snapshot = document.evaluate(target.dom_path, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+        if (snapshot.snapshotLength) {
+          const nodes = [];
+          for (let i = 0; i < snapshot.snapshotLength; i++) nodes.push(snapshot.snapshotItem(i));
+          return pickBest(nodes);
+        }
       } catch (e) { /* invalid path */ }
     }
     return null;
@@ -491,23 +519,15 @@
   function renderMarkers() {
     const layer = root().querySelector('[data-tux-layer]');
     layer.querySelectorAll('.tux-marker').forEach((m) => m.remove());
-    document.querySelectorAll('dialog[open] > .tux-marker, [role="dialog"] > .tux-marker').forEach((m) => m.remove());
+    document.querySelectorAll('dialog .tux-marker, [role="dialog"] .tux-marker').forEach((m) => m.remove());
+    pinRegistry = [];
     for (const item of items) {
       const target = locate(item.target);
       if (!target) continue; // target temporarily gone; feedback stays persisted (SPC 60)
       const host = overlayHostFor(target);
       const inTopLayer = host !== layer;
-      const rect = target.getBoundingClientRect();
       const pin = el('button', 'tux-marker', String(item.feedback.type[0].toUpperCase()));
       pin.dataset.id = item.id;
-      if (inTopLayer) {
-        pin.style.position = 'fixed';
-        pin.style.left = `${rect.left + rect.width - 12}px`;
-        pin.style.top = `${Math.max(0, rect.top - 8)}px`;
-      } else {
-        pin.style.left = `${rect.left + window.scrollX + rect.width - 12}px`;
-        pin.style.top = `${rect.top + window.scrollY - 8}px`;
-      }
       pin.classList.toggle('tux-resolved', item.status !== 'open');
       pin.title = `${item.feedback.type}: ${item.feedback.text}`;
       pin.setAttribute('data-tux-ui', '');
@@ -516,7 +536,61 @@
         openEditor({ el: target, mode: 'edit', item });
       });
       host.appendChild(pin);
+      pinRegistry.push({ target, pin, inTopLayer, lastKey: '' });
     }
+    positionPins();
+    bindReposition();
+  }
+
+  // Markers are anchored to the element's CURRENT rect — never to
+  // coordinates captured at creation time. positionPins() runs on
+  // resize/scroll/DOM mutations (rAF-throttled) so markers follow layout
+  // changes: splitter drag, carousel transforms, dialogs opening and
+  // closing, route-level reflows. Invisible targets hide their pin and
+  // reveal it again when the element becomes visible (SPC 60).
+  let pinRegistry = [];
+  function positionPins() {
+    for (const entry of pinRegistry) {
+      const { pin, target, inTopLayer } = entry;
+      const rects = target.getClientRects();
+      const rect = target.getBoundingClientRect();
+      const visible = rects.length > 0 && rect.width > 0 && rect.height > 0;
+      const key = visible
+        ? `${Math.round(rect.left)},${Math.round(rect.top)},${Math.round(rect.width)}x${Math.round(rect.height)}|${Math.round(window.scrollX)},${Math.round(window.scrollY)}`
+        : 'hidden';
+      if (entry.lastKey === key) continue;
+      entry.lastKey = key;
+      if (!visible) { pin.style.display = 'none'; continue; }
+      pin.style.display = '';
+      if (inTopLayer) {
+        pin.style.position = 'fixed';
+        pin.style.left = `${rect.left + rect.width - 12}px`;
+        pin.style.top = `${Math.max(0, rect.top - 8)}px`;
+      } else {
+        pin.style.left = `${rect.left + window.scrollX + rect.width - 12}px`;
+        pin.style.top = `${rect.top + window.scrollY - 8}px`;
+      }
+    }
+  }
+  let rafPending = false;
+  function scheduleReposition() {
+    if (rafPending) return;
+    rafPending = true;
+    requestAnimationFrame(() => { rafPending = false; positionPins(); });
+  }
+  let repositionBound = false;
+  function bindReposition() {
+    if (repositionBound) return;
+    repositionBound = true;
+    window.addEventListener('resize', scheduleReposition);
+    document.addEventListener('scroll', scheduleReposition, true);
+    const start = () => {
+      new MutationObserver(scheduleReposition).observe(document.documentElement, {
+        childList: true, subtree: true, attributes: true,
+      });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+    else start();
   }
 
   async function refresh() {

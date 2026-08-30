@@ -237,3 +237,67 @@ test('build exclusion: no TUX code, ?tux=on has no effect (SPC 63, 70, 89)', asy
   expect(await page.locator('[data-tux-launcher]').count()).toBe(0);
   expect(await page.evaluate(() => window.__TUX_READY__ ?? false)).toBe(false);
 });
+
+test('markers re-anchor after layout changes and follow dialog visibility (SPC 60)', async ({ page }) => {
+  tux('feedback clear --all --force');
+  await page.goto('/products');
+  await page.click('[data-tux-launcher]');
+  await page.click('[data-tux-id="product-price-p1"]');
+  await expect(page.locator('.tux-editor')).toBeVisible();
+  await page.locator('[data-ed-text]').fill('Re-anchor regression check');
+  await page.locator('[data-act="save"]').click();
+  const marker = page.locator('.tux-marker');
+  await expect(marker).toHaveCount(1);
+  const target = page.locator('[data-tux-id="product-price-p1"]');
+
+  const assertAnchored = async () => {
+    const tb = await target.boundingBox();
+    const mb = await marker.boundingBox();
+    const anchorX = tb.x + tb.width - 12;
+    const anchorY = Math.max(0, tb.y - 8);
+    expect(Math.abs(mb.x - anchorX)).toBeLessThan(40);
+    expect(Math.abs(mb.y - anchorY)).toBeLessThan(40);
+  };
+
+  await assertAnchored();
+
+  // layout change 1: viewport resize (responsive reflow)
+  await page.setViewportSize({ width: 760, height: 800 });
+  await page.waitForTimeout(120);
+  await assertAnchored();
+
+  // layout change 2: back to wide
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.waitForTimeout(120);
+  await assertAnchored();
+
+  // dialog visibility: feedback inside the modal hides with the dialog
+  // and reappears next to its element when the dialog opens again.
+  // The coupon modal only exists on the checkout route (SPC 15, 60).
+  await page.click('[data-tux-launcher]'); // mode off for app navigation
+  await page.click('[data-tux-id="nav-checkout"]');
+  await expect(page.locator('[data-tux-id="checkout-submit"]')).toBeVisible();
+  await page.click('[data-tux-id="coupon-open"]');
+  await expect(page.locator('#coupon-modal')).toBeVisible();
+  await page.keyboard.press('Alt+t');
+  await page.click('[data-tux-id="coupon-input"]');
+  await page.locator('[data-ed-type]').selectOption('change');
+  await page.locator('[data-ed-text]').fill('Modal re-visibility check');
+  await page.locator('[data-act="save"]').click();
+  const modalPin = page.locator('.tux-marker');
+  await expect(modalPin).toHaveCount(1);
+  await page.keyboard.press('Escape'); // app closes the modal
+  await expect(page.locator('#coupon-modal')).not.toBeVisible();
+  await expect(modalPin).toBeHidden(); // the fix: hidden, not parked at stale coordinates
+  await page.click('[data-tux-id="coupon-open"]');
+  await expect(page.locator('#coupon-modal')).toBeVisible();
+  await expect(modalPin).toBeVisible(); // the fix: re-anchored when visible again
+  const tb = await page.locator('[data-tux-id="coupon-input"]').boundingBox();
+  const mb = await modalPin.boundingBox();
+  expect(Math.abs(mb.x - (tb.x + tb.width - 12))).toBeLessThan(40);
+
+  // reload keeps the anchored restore path intact
+  await page.reload();
+  await expect(page.locator('.tux-marker')).toHaveCount(1);
+  await expect(page.locator('.tux-marker')).toBeHidden(); // modal closed after reload
+});
