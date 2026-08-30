@@ -179,3 +179,68 @@ def test_proxy_forwards_target_errors_as_is(app_server, tmp_path: Path):
         assert raised, "target 404 must pass through as HTTPError"
     finally:
         tux(["live", "stop-review"], work)
+        srv.shutdown()
+        srv.server_close()
+
+
+def test_proxy_forwards_upstream_headers(tmp_path: Path):
+    """The proxy is transparent: it must forward upstream response headers
+    (Content-Type for assets, Set-Cookie for pages) — duality with
+    js/src/server.js. Only Content-Length (recomputed) and, for instrumented
+    HTML, Cache-Control (no-store) are rewritten."""
+    work = tmp_path
+    port = 4190
+
+    class Handler(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def do_GET(self):
+            if self.path == "/app.js":
+                body = b"console.log('app');"
+                self.send_response(200)
+                self.send_header("Content-Type", "application/javascript; charset=utf-8")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+            else:
+                body = b'<!doctype html><html><head><title>App</title></head><body><h1 id="h">App</h1></body></html>'
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Set-Cookie", "sid=abc123; Path=/")
+                self.send_header("Content-Length", str(len(body)))
+                self.end_headers()
+                self.wfile.write(body)
+
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    target = f"http://127.0.0.1:{srv.server_address[1]}"
+
+    config = {
+        "project_id": "proxy-hdr-test",
+        "review": {"enabled": True, "store": ".tux/feedback.json", "host": "127.0.0.1", "port": port},
+    }
+    (work / "tux.config.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8", newline="\n")
+
+    started = tux(["live", "start-review", "--url", target, "--port", str(port)], work)
+    assert started.returncode == 0, started.stderr
+    try:
+        wait_for(f"http://127.0.0.1:{port}/api/tux/health")
+
+        # Non-HTML asset: upstream Content-Type must be forwarded verbatim
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/app.js") as r:
+            ctype = r.headers.get("Content-Type")
+            body = r.read().decode("utf-8")
+        assert ctype and ctype.startswith("application/javascript"), f"Content-Type not forwarded: {ctype!r}"
+        assert body == "console.log('app');", "asset body must pass through unmodified"
+
+        # HTML page: upstream Set-Cookie must survive alongside injection
+        with urllib.request.urlopen(f"http://127.0.0.1:{port}/") as r:
+            cookie = r.headers.get("Set-Cookie")
+            html = r.read().decode("utf-8")
+        assert cookie == "sid=abc123; Path=/", f"Set-Cookie not forwarded: {cookie!r}"
+        assert "/__tux__/bootstrap.js" in html
+    finally:
+        tux(["live", "stop-review"], work)
+        srv.shutdown()
+        srv.server_close()

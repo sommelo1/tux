@@ -294,20 +294,31 @@ def _proxy(state, handler):
         headers = dict(e.headers)
     except Exception as exc:
         return _send_json(handler, 502, {"error": {"code": "bad_gateway", "message": f"target unreachable: {exc}"}})
+    # Transparent proxy: forward every upstream response header so the
+    # browser sees the target app as directly (SPC transparency). TUX only
+    # rewrites what instrumentation requires. Must match js/src/server.js.
     if ctype.startswith("text/html"):
+        # Injection lengthens the body, and the instrumented page is
+        # session-specific: recompute Content-Length and force no-store.
         body_out = inject(payload.decode("utf-8", "replace")).encode("utf-8")
         handler.send_response(status)
-        handler.send_header("Content-Type", ctype)
+        for k, v in headers.items():
+            if k.lower() in ("transfer-encoding", "content-length", "cache-control", "connection"):
+                continue
+            handler.send_header(k, v)
         handler.send_header("Cache-Control", "no-store")
-        # HTTP/1.1 keep-alive: without Content-Length clients wait forever
         handler.send_header("Content-Length", str(len(body_out)))
         handler.end_headers()
         handler.wfile.write(body_out)
         return
+    # Non-HTML assets pass through unmodified: keep upstream Content-Type,
+    # Cache-Control, Location, etc. Recompute Content-Length (we buffered)
+    # and drop Transfer-Encoding (we answer with a fixed length).
     handler.send_response(status)
     for k, v in headers.items():
-        if k.lower() in ("content-type", "cache-control", "location", "transfer-encoding"):
-            continue
+        lk = k.lower()
+        if lk in ("content-length", "transfer-encoding", "connection"):
+            continue  # re-set below / managed by this server
         handler.send_header(k, v)
     handler.send_header("Content-Length", str(len(payload)))
     handler.end_headers()

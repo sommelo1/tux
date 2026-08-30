@@ -1025,6 +1025,13 @@ bootstrap import
 
 The public behavior must remain identical.
 
+For the reverse-proxy strategy, the proxy MUST forward every upstream response
+header (e.g. `Content-Type`, `Set-Cookie`, `Location`) so the application
+behaves as if the proxy were not present. The proxy MUST recompute
+`Content-Length` to match the body it actually sends and, for instrumented HTML
+responses only, MUST set `Cache-Control: no-store`. No other response-header
+modification is permitted.
+
 ## 35. Framework Adapter Boundary
 
 Framework adapters should primarily handle:

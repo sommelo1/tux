@@ -130,3 +130,47 @@ test('live start-review without url/cmd and no config store is rejected explicit
   assert.equal(r.status, 4, `exit ${r.status}: ${r.stderr}`);
   assert.ok(r.stderr.includes('did not become reachable') || r.stderr.includes('not become healthy'));
 });
+
+test('live proxy forwards upstream response headers (duality with py server)', async () => {
+  const work = mkdtempSync(join(tmpdir(), 'tux-hdr-'));
+  cleanups.push(() => rmSync(work, { recursive: true, force: true }));
+
+  const app = createServer((req, res) => {
+    if (req.url === '/app.js') {
+      const body = "console.log('app');";
+      res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8', 'Content-Length': Buffer.byteLength(body) });
+      res.end(body);
+    } else {
+      const body = '<!doctype html><html><head><title>App</title></head><body><h1 id="h">App</h1></body></html>';
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': 'sid=abc123; Path=/', 'Content-Length': Buffer.byteLength(body) });
+      res.end(body);
+    }
+  });
+  await new Promise((r) => app.listen(0, '127.0.0.1', r));
+  const appPort = app.address().port;
+  cleanups.push(() => app.close());
+
+  const port = 4191;
+  const cfg = { project_id: 'proxy-hdr-test', review: { enabled: true, store: '.tux/feedback.json', host: '127.0.0.1', port } };
+  const { writeFileSync } = await import('node:fs');
+  writeFileSync(join(work, 'tux.config.json'), JSON.stringify(cfg, null, 2) + '\n');
+
+  const started = tux(['live', 'start-review', '--url', `http://127.0.0.1:${appPort}`, '--port', String(port)], work);
+  assert.equal(started.status, 0, started.stderr);
+  cleanups.push(() => tux(['live', 'stop-review', '--format', 'json'], work));
+  await waitFor(`http://127.0.0.1:${port}/api/tux/health`);
+
+  // Non-HTML asset: upstream Content-Type must be forwarded verbatim
+  const jsRes = await fetch(`http://127.0.0.1:${port}/app.js`);
+  const jsCtype = jsRes.headers.get('content-type');
+  const jsBody = await jsRes.text();
+  assert.ok(jsCtype && jsCtype.startsWith('application/javascript'), `Content-Type not forwarded: ${jsCtype}`);
+  assert.equal(jsBody, "console.log('app');");
+
+  // HTML page: upstream Set-Cookie must survive alongside injection
+  const page = await fetch(`http://127.0.0.1:${port}/`);
+  const cookie = page.headers.get('set-cookie');
+  const html = await page.text();
+  assert.equal(cookie, 'sid=abc123; Path=/');
+  assert.ok(html.includes('/__tux__/bootstrap.js'));
+});
