@@ -39,18 +39,26 @@ const pyInit = readFileSync(join(root, 'py', 'tux', '__init__.py'), 'utf8');
 if (!pyproject.includes(`version = "${version}"`)) fail(`pyproject.toml version does not match ${version}`);
 if (!pyInit.includes(`__version__ = "${version}"`)) fail(`py/tux/__init__.py version does not match ${version}`);
 
-for (const p of [join(pyDir, 'build'), join(pyDir, 'dist'), join(pyDir, 'tux_review.egg-info')]) {
+for (const p of [join(pyDir, 'build'), join(pyDir, 'dist'), join(pyDir, 'tux_review.egg-info'), join(pyDir, 'tux_uix.egg-info')]) {
   rmSync(p, { recursive: true, force: true });
 }
 mkdirSync(distDir, { recursive: true });
+// stale artifacts from previous releases would shadow the fresh build in the
+// inspection below and would also be uploaded by the tag-triggered publish
+for (const f of readdirSync(distDir)) {
+  if (f.startsWith('tux_review-')) rmSync(join(distDir, f), { force: true });
+}
 
 run(python, ['-m', 'pip', 'install', '--quiet', 'build'], root);
 run(python, ['-m', 'build', '--outdir', distDir], pyDir);
 
 const distFiles = readdirSync(distDir);
-const wheel = distFiles.find((f) => f.endsWith('.whl'));
-const sdist = distFiles.find((f) => f.endsWith('.tar.gz'));
-if (!wheel || !sdist) fail(`expected wheel + sdist in dist/, got: ${distFiles.join(', ')}`);
+// exact versioned names — never let a leftover artifact stand in
+const wheel = `tux_review-${version}-py3-none-any.whl`;
+const sdist = `tux_review-${version}.tar.gz`;
+if (!existsSync(join(distDir, wheel)) || !existsSync(join(distDir, sdist))) {
+  fail(`expected ${wheel} + ${sdist} in dist/, got: ${distFiles.join(', ')}`);
+}
 
 const check = `
 import sys, tarfile, zipfile, pathlib, re
