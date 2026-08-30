@@ -67,6 +67,11 @@ test('live start-review → proxy injects client → status → persistence acro
   cleanups.push(() => tux(['live', 'stop-review', '--format', 'json'], work));
   await waitFor('http://127.0.0.1:4186/api/tux/health');
 
+  // start-review deploys the packaged skills (SPC 32)
+  const skill = join(work, '.kilo', 'skills', 'tux-live-install', 'SKILL.md');
+  assert.ok(existsSync(skill), 'start-review deploys agent skills');
+  assert.ok(readFileSync(skill, 'utf8').startsWith('---\nname: tux-live-install'));
+
   // 2) the application stays functional and gets the client injected
   const page = await fetch('http://127.0.0.1:4186/');
   const html = await page.text();

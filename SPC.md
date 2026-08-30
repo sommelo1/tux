@@ -904,6 +904,20 @@ Purpose:
 
 Integrate TUX into the clickable design environment of the current project.
 
+Skill Deployment:
+
+On every non-dry-run execution of `tux design install` and `tux design
+start-review`, the CLI deploys the packaged canonical skills (sections 79–84)
+verbatim into the project's agent skill directories
+`.kilo/skills/tux-<name>/SKILL.md`, `.claude/skills/tux-<name>/SKILL.md` and
+`.hermes/skills/tux-<name>/SKILL.md`. Deployment is idempotent: every run
+rewrites the deployed copies from the packaged sources, so a package update
+refreshes them on the next invocation. Deployment MUST NOT create, modify or
+delete any other file in the agent directories. Package managers do not
+execute project code at installation time; therefore deployment happens on
+the first project-scoped CLI invocation, not during `pip install` or
+`npm install`.
+
 ## 29. Design Integration Discovery
 
 The integration must determine:
@@ -965,6 +979,20 @@ tux-live-install
 Purpose:
 
 Integrate TUX into an existing runnable web application.
+
+Skill Deployment:
+
+On every non-dry-run execution of `tux live install` and `tux live
+start-review`, the CLI deploys the packaged canonical skills (sections 79–84)
+verbatim into the project's agent skill directories
+`.kilo/skills/tux-<name>/SKILL.md`, `.claude/skills/tux-<name>/SKILL.md` and
+`.hermes/skills/tux-<name>/SKILL.md`. Deployment is idempotent: every run
+rewrites the deployed copies from the packaged sources, so a package update
+refreshes them on the next invocation. Deployment MUST NOT create, modify or
+delete any other file in the agent directories, and both CLI engines deploy
+byte-identical copies. Package managers do not execute project code at
+installation time; therefore deployment happens on the first project-scoped
+CLI invocation, not during `pip install` or `npm install`.
 
 `tux live create` scaffolds a runnable live application (vanilla, react, vue or angular) using the same templates as `tux design create`. The artifact is identical; the report declares `"kind": "live"` and the next steps reference `tux live install` and `tux live start-review`. Feedback gathered from it carries `"origin": "live"`.
 

@@ -15,6 +15,7 @@ from .canonical import canonical_json
 from .errors import CliError, Exit
 from .ids import canonical_timestamp
 from .store import load_store
+from .skills_deploy import deploy_skills
 
 SERVER_STATE_FILE = ".tux/server.json"
 
@@ -59,6 +60,7 @@ def op_live_install(opts: dict) -> dict:
         m = re.search(r"--port[= ](\d+)", dev_command)
         if m:
             dev_port = int(m.group(1))
+    deploy_skills(str(cwd))
     report = {
         "action": "install",
         "kind": "live",
@@ -111,6 +113,7 @@ def start_server(opts: dict, spec: dict) -> dict:
     if spec.get("dry_run"):
         return {"stdout": canonical_json(spec["plan"]) + "\n", "exit": Exit.OK}
 
+    deploy_skills(opts["cwd"])
     (Path(opts["cwd"]) / ".tux").mkdir(parents=True, exist_ok=True)
     app_pid = None
     if spec.get("cmd"):

@@ -13,6 +13,7 @@ import { CliError, EXIT } from './errors.js';
 import { canonicalJson } from './canonical.js';
 import { canonicalTimestamp } from './ids.js';
 import { loadStore } from './store.js';
+import { deploySkills } from './skills.js';
 
 const SERVER_STATE_FILE = '.tux/server.json';
 
@@ -59,6 +60,7 @@ export function opLiveInstall(opts) {
     const m = devCommand.match(/--port[= ](\d+)/);
     if (m) devPort = Number(m[1]);
   }
+  deploySkills(cwd);
   const report = {
     action: 'install',
     kind: 'live',
@@ -87,6 +89,7 @@ export async function startServer(opts, spec) {
   if (spec.dryRun) {
     return { stdout: canonicalJson(spec.plan) + '\n', exit: EXIT.ok };
   }
+  deploySkills(opts.cwd);
   mkdirSync(join(opts.cwd, '.tux'), { recursive: true });
   let appPid = null;
   if (spec.cmd) {

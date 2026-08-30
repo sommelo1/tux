@@ -226,6 +226,25 @@ From this point on, every example uses the same command form: `tux …`.
 Only the installation mechanism differs; CLI behavior and JSON output are
 byte-identical across Node and Python.
 
+### Agent skills
+
+The package ships the 13 canonical `tux-*` agent skills. Running
+`tux design install`, `tux live install` or either `start-review` command
+inside a project deploys them verbatim into the project's agent skill
+directories (`.kilo/`, `.claude/`, `.hermes/`), so agents in that project
+can follow the TUX workflows:
+
+```text
+.kilo/skills/tux-live-install/SKILL.md
+.claude/skills/tux-live-install/SKILL.md
+.hermes/skills/tux-live-install/SKILL.md
+```
+
+Deployment is idempotent and refreshes the copies on every run — after a
+package update, the next `tux` invocation brings the skills back in sync.
+Existing skills from other tools are never touched, and your feedback store
+(`.tux/feedback.json`) is unaffected.
+
 ## Usage
 
 The CLI follows one grammar: `tux <domain> <action>`.

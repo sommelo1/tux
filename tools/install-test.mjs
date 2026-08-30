@@ -8,15 +8,16 @@
  *
  * 1. npm: fresh project dir → `npm install <tarball>` → CLI round-trip
  *    (--version, feedback create/show, design create for ALL frameworks,
- *    skills + client files present in node_modules).
+ *    skills + client files present in node_modules, skill deployment into
+ *    the project's agent directories incl. refresh + foreign-skill safety).
  * 2. Frameworks: for vanilla, react, vue and angular a dedicated env
  *    materializes the scaffold via the installed CLI; react/vue/angular
  *    run a real `npm install` + production build; every design is then
  *    served by the installed CLI and verified over HTTP (client
  *    injection + feedback API round-trip).
  * 3. Python: fresh venv → `pip install <wheel>` → console script `tux`
- *    round-trip, pip check, angular scaffold materialization, and the
- *    Python server verified over HTTP.
+ *    round-trip, pip check, angular scaffold materialization, skill
+ *    deployment, and the Python server verified over HTTP.
  *
  * Usage: node tools/install-test.mjs [--keep]
  * Requires dist/ artifacts from tools/package-js.mjs + tools/package-py.mjs.
@@ -113,6 +114,32 @@ const tmpRoot = join(tmpdir(), `tux-install-test-${Date.now()}`);
 mkdirSync(tmpRoot, { recursive: true });
 const cleanup = keep ? () => console.log(`kept: ${tmpRoot}`) : () => rmSync(tmpRoot, { recursive: true, force: true });
 
+const SKILL_NAMES = ['tux-design-create', 'tux-design-incorporate', 'tux-design-install', 'tux-design-start-review', 'tux-design-stop-review', 'tux-feedback-delete', 'tux-feedback-export', 'tux-feedback-show', 'tux-live-create', 'tux-live-incorporate', 'tux-live-install', 'tux-live-start-review', 'tux-live-stop-review'];
+
+/**
+ * `tux design install` must deploy the packaged skills verbatim into the
+ * project's agent skill directories (SPC 28) and refresh modified copies on
+ * every run (SPC update semantics), while leaving foreign skills untouched.
+ */
+function assertDeployedSkills(envRoot, install, label) {
+  install();
+  for (const agent of ['.kilo', '.claude', '.hermes']) {
+    const base = join(envRoot, agent, 'skills');
+    const got = readdirSync(base).filter((d) => d.startsWith('tux-')).sort();
+    check(JSON.stringify(got) === JSON.stringify(SKILL_NAMES), `${label}: ${agent} → 13 tux skills deployed`);
+    check(readFileSync(join(base, 'tux-live-install', 'SKILL.md'), 'utf8').startsWith('---\nname: tux-live-install'),
+      `${label}: ${agent} SKILL.md present`);
+  }
+  writeFileSync(join(envRoot, '.kilo', 'skills', 'tux-live-install', 'SKILL.md'), 'stale content');
+  mkdirSync(join(envRoot, '.kilo', 'skills', 'mds-install'), { recursive: true });
+  writeFileSync(join(envRoot, '.kilo', 'skills', 'mds-install', 'SKILL.md'), 'foreign');
+  install();
+  check(readFileSync(join(envRoot, '.kilo', 'skills', 'tux-live-install', 'SKILL.md'), 'utf8').startsWith('---\nname: tux-live-install'),
+    `${label}: skill refresh restores package content on rerun`);
+  check(readFileSync(join(envRoot, '.kilo', 'skills', 'mds-install', 'SKILL.md'), 'utf8') === 'foreign',
+    `${label}: foreign skills untouched`);
+}
+
 try {
   // ── 1) npm package: dedicated project with the tarball installed ──
   const npmEnv = join(tmpRoot, 'npm-env');
@@ -146,6 +173,8 @@ try {
   const skillCount = readdirSync(join(pkgRoot, 'skills')).filter((f) => f.endsWith('.md')).length;
   check(skillCount === 13, `npm: 13 skills shipped (found ${skillCount})`);
   check(existsSync(join(pkgRoot, 'client', 'tux-review.js')), 'npm: review client shipped');
+
+  assertDeployedSkills(npmEnv, () => run('node', [cli, 'design', 'install'], npmEnv), 'npm');
 
   // ── 2) frameworks: dedicated env per framework, real install + build + serve ──
   const frameworkSpecs = [
@@ -191,6 +220,8 @@ try {
   run(venvTux, ['design', 'create', '--framework', 'angular', '--name', 'demo'], pyEnv);
   check(existsSync(join(pyEnv, 'requirements', 'demo', 'design', 'src', 'app', 'app.component.ts')),
     'py: design create angular → scaffold complete (templates shipped in wheel)');
+
+  assertDeployedSkills(pyEnv, () => run(venvTux, ['design', 'install'], pyEnv), 'py');
 
   // the py server is verified on the vanilla scaffold (no framework build needed —
   // framework serving incl. real builds is covered by the npm-package section above)

@@ -11,6 +11,7 @@ import { canonicalJson } from './canonical.js';
 import { CONFIG_FILE, defaultConfig } from './config.js';
 import { SUPPORTED_FRAMEWORKS, designTemplate } from './templates.js';
 import { startServer, opLiveStatus, opLiveStop } from './live.js';
+import { deploySkills } from './skills.js';
 
 function textReport(lines) {
   return { stdout: lines.join('\n') + '\n', exit: EXIT.ok };
@@ -40,6 +41,7 @@ export function opDesignInstall(opts, spec) {
   if (spec.root) config.design.root = spec.root;
   const root = config.design.root ?? 'requirements';
   writeFileSync(configPath, canonicalJson(config) + '\n', 'utf8');
+  deploySkills(cwd);
   const report = {
     action: 'install',
     kind: 'design',

@@ -80,6 +80,11 @@ def test_review_lifecycle(app_server, tmp_path: Path):
         assert '<h1 id="h">App</h1>' in html
         assert "/__tux__/bootstrap.js" in html
 
+        # start-review deploys the packaged skills (SPC 32)
+        skill = work / ".kilo" / "skills" / "tux-live-install" / "SKILL.md"
+        assert skill.exists(), "start-review must deploy agent skills"
+        assert skill.read_text(encoding="utf-8").startswith("---\nname: tux-live-install")
+
         req = urllib.request.Request(
             f"http://127.0.0.1:{port}/api/tux/feedback", method="POST",
             data=json.dumps({"type": "issue", "text": "Persist me",

@@ -11,6 +11,7 @@ from .config import CONFIG_FILE, default_config
 from .errors import CliError, Exit
 from .templates import SUPPORTED_FRAMEWORKS, design_template
 from .live import start_server, op_live_status, op_live_stop
+from .skills_deploy import deploy_skills
 
 
 def _text_report(lines: list[str]) -> dict:
@@ -42,6 +43,7 @@ def op_design_install(opts: dict, spec: dict) -> dict:
         config["design"]["root"] = spec["root"]
     root = config["design"].get("root") or "requirements"
     Path(config_path).write_text(canonical_json(config) + "\n", encoding="utf-8", newline="\n")
+    deploy_skills(cwd)
     report_config = config_path
     if opts.get("config_path") is None:
         report_config = CONFIG_FILE
