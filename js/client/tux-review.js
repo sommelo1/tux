@@ -131,14 +131,6 @@
   }
   function locate(target) {
     if (!target) return null;
-    if (target.tux_id) {
-      const el = document.querySelector(`[data-tux-id="${cssEscape(target.tux_id)}"]`);
-      if (el) return el;
-    }
-    if (target.test_id) {
-      const el = document.querySelector(`[data-testid="${cssEscape(target.test_id)}"], [data-test-id="${cssEscape(target.test_id)}"]`);
-      if (el) return el;
-    }
     // Fingerprint validation: when a resolution strategy yields several
     // candidates (nth-child paths drift after DOM changes), pick the one
     // that best matches the stored fingerprint — component/instance scope,
@@ -163,23 +155,45 @@
       }
       return best;
     }
-    if (target.css_selector) {
-      try {
-        const nodes = document.querySelectorAll(target.css_selector);
-        if (nodes.length) return pickBest(nodes);
-      } catch (e) { /* invalid selector */ }
+    function resolveByPath() {
+      if (target.css_selector) {
+        try {
+          const nodes = document.querySelectorAll(target.css_selector);
+          if (nodes.length) return pickBest(nodes);
+        } catch (e) { /* invalid selector */ }
+      }
+      if (target.dom_path) {
+        try {
+          const snapshot = document.evaluate(target.dom_path, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+          if (snapshot.snapshotLength) {
+            const nodes = [];
+            for (let i = 0; i < snapshot.snapshotLength; i++) nodes.push(snapshot.snapshotItem(i));
+            return pickBest(nodes);
+          }
+        } catch (e) { /* invalid path */ }
+      }
+      return null;
     }
-    if (target.dom_path) {
-      try {
-        const snapshot = document.evaluate(target.dom_path, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-        if (snapshot.snapshotLength) {
-          const nodes = [];
-          for (let i = 0; i < snapshot.snapshotLength; i++) nodes.push(snapshot.snapshotItem(i));
-          return pickBest(nodes);
-        }
-      } catch (e) { /* invalid path */ }
+
+    const byTest = target.test_id
+      ? document.querySelector(`[data-testid="${cssEscape(target.test_id)}"], [data-test-id="${cssEscape(target.test_id)}"]`)
+      : null;
+    if (byTest) return byTest; // explicit test hook: exact element (SPC 16)
+
+    const byPath = resolveByPath();
+    const byId = target.tux_id
+      ? document.querySelector(`[data-tux-id="${cssEscape(target.tux_id)}"]`)
+      : null;
+
+    // A tux_id on a CONTAINER must not coarsen the target: when the path
+    // resolves to an element inside the id element, the path is the finer,
+    // correct target. Only trust the id over a path that drifted outside
+    // of it (SPC 16: multiple independent signals, finest wins).
+    if (byId) {
+      if (byPath && (byId === byPath || byId.contains(byPath))) return byPath;
+      return byId;
     }
-    return null;
+    return byPath;
   }
 
   // ─── route + state tracking (SPC 13–15, 59) ───
