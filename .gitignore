@@ -15,6 +15,10 @@ uv.lock
 # TUX runtime artifacts
 .tux/
 !**/fixtures/**/.tux/
+# skill deployment byproducts of the example fixtures (e2e runs tux install there)
+examples/**/.kilo/
+examples/**/.claude/
+examples/**/.hermes/
 
 # Test / tooling
 .pytest_cache/
