@@ -303,8 +303,15 @@ function proxy(state, req, res) {
       const chunks = [];
       up.on('data', (c) => chunks.push(c));
       up.on('end', () => {
-        res.writeHead(up.statusCode, up.headers);
-        res.end(inject(Buffer.concat(chunks).toString('utf8')));
+        // injection lengthens the body — the upstream Content-Length must
+        // not be forwarded or clients truncate/wait on the response
+        const body = inject(Buffer.concat(chunks).toString('utf8'));
+        const headers = { ...up.headers };
+        delete headers['transfer-encoding'];
+        headers['content-length'] = String(Buffer.byteLength(body));
+        headers['cache-control'] = 'no-store';
+        res.writeHead(up.statusCode, headers);
+        res.end(body);
       });
       return;
     }

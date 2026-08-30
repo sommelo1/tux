@@ -13,6 +13,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
+import tux
 from tux.cli import run
 
 CONF_ROOT = Path(__file__).resolve().parents[2] / "conformance"
@@ -81,7 +82,7 @@ def test_conformance():
         expected = (case_dir / "expected.txt").read_text(encoding="utf-8")
         nl = expected.index("\n")
         want_exit = int(expected[:nl].replace("exit ", ""))
-        want_out = expected[nl + 1:]
+        want_out = expected[nl + 1:].replace('{{PACKAGE_VERSION}}', tux.__version__)
         if result["exit"] != want_exit:
             problems.append(f"exit: want {want_exit}, got {result['exit']}")
         if result["stdout"] != want_out:

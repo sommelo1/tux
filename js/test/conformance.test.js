@@ -12,7 +12,7 @@
  */
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { run } from '../src/cli.js';
 
@@ -88,7 +88,8 @@ async function main() {
     const expected = readFileSync(join(dir, 'expected.txt'), 'utf8');
     const nl = expected.indexOf('\n');
     const wantExit = Number(expected.slice(0, nl).replace('exit ', ''));
-    const wantOut = expected.slice(nl + 1);
+    const wantOut = expected.slice(nl + 1).replaceAll('{{PACKAGE_VERSION}}',
+      JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf8')).version);
     if (result.exit !== wantExit) problems.push(`exit: want ${wantExit}, got ${result.exit}`);
     if (result.stdout !== wantOut) {
       problems.push('stdout differs:');

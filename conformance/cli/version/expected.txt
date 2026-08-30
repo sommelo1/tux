@@ -1,2 +1,2 @@
 exit 0
-tux 0.1.0
+tux {{PACKAGE_VERSION}}

@@ -13,8 +13,7 @@ from .feedback import (op_clear, op_create, op_delete, op_export,
                        op_incorporate, op_show, op_update, op_validate)
 from .design import op_design_create, op_design_install, op_design_start, op_design_status, op_design_stop, op_live_create
 from .live import op_live_install, op_live_start, op_live_status, op_live_stop
-
-VERSION = "0.1.0"
+from . import __version__ as VERSION
 
 VALUE_FLAGS = {
     "config", "format", "type", "text", "route", "page", "component", "component-instance", "instance",

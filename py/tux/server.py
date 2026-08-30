@@ -295,16 +295,21 @@ def _proxy(state, handler):
     except Exception as exc:
         return _send_json(handler, 502, {"error": {"code": "bad_gateway", "message": f"target unreachable: {exc}"}})
     if ctype.startswith("text/html"):
+        body_out = inject(payload.decode("utf-8", "replace")).encode("utf-8")
         handler.send_response(status)
         handler.send_header("Content-Type", ctype)
         handler.send_header("Cache-Control", "no-store")
+        # HTTP/1.1 keep-alive: without Content-Length clients wait forever
+        handler.send_header("Content-Length", str(len(body_out)))
         handler.end_headers()
-        handler.wfile.write(inject(payload.decode("utf-8", "replace")).encode("utf-8"))
+        handler.wfile.write(body_out)
         return
     handler.send_response(status)
     for k, v in headers.items():
-        if k.lower() in ("content-type", "cache-control", "location"):
-            handler.send_header(k, v)
+        if k.lower() in ("content-type", "cache-control", "location", "transfer-encoding"):
+            continue
+        handler.send_header(k, v)
+    handler.send_header("Content-Length", str(len(payload)))
     handler.end_headers()
     handler.wfile.write(payload)
 

@@ -7,13 +7,20 @@
  *
  * @module cli
  */
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { CliError, EXIT } from './errors.js';
 import { loadConfig } from './config.js';
 import { opShow, opCreate, opUpdate, opDelete, opClear, opExport, opIncorporate, opValidate } from './feedback.js';
 import { opDesignInstall, opDesignCreate, opLiveCreate, opDesignStart, opDesignStatus, opDesignStop } from './design.js';
 import { opLiveInstall, opLiveStart, opLiveStatus, opLiveStop } from './live.js';
 
-export const VERSION = '0.1.0';
+// Single source of truth is package.json — a hardcoded constant here
+// drifted to 0.1.0 after the 0.1.1 release and broke the install test.
+export const VERSION = JSON.parse(
+  readFileSync(join(dirname(fileURLToPath(import.meta.url)), '..', 'package.json'), 'utf8'),
+).version;
 
 const VALUE_FLAGS = new Set([
   'config', 'format', 'type', 'text', 'route', 'page', 'component', 'component-instance', 'instance',
