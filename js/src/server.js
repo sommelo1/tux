@@ -287,6 +287,22 @@ function static_(state, res, path) {
   res.end(body);
 }
 
+// Transparent proxy response headers (SPC 34): forward every upstream header
+// except the hop-by-hop / length headers this server manages itself. Must
+// produce the same header set as py/tux/server.py::_proxy.
+function proxyHeaders(upHeaders, { html, bodyLength }) {
+  const headers = {};
+  for (const [k, v] of Object.entries(upHeaders)) {
+    const lk = k.toLowerCase();
+    if (lk === 'connection' || lk === 'transfer-encoding' || lk === 'content-length') continue;
+    if (html && lk === 'cache-control') continue;
+    headers[k] = v;
+  }
+  if (html) headers['cache-control'] = 'no-store';
+  headers['content-length'] = String(bodyLength);
+  return headers;
+}
+
 function proxy(state, req, res) {
   const target = new URL(state.target);
   const options = {
@@ -298,25 +314,17 @@ function proxy(state, req, res) {
     headers: { ...req.headers, host: target.host },
   };
   const upstream = httpRequest(options, (up) => {
-    const type = up.headers['content-type'] ?? '';
-    if (type.startsWith('text/html')) {
-      const chunks = [];
-      up.on('data', (c) => chunks.push(c));
-      up.on('end', () => {
-        // injection lengthens the body — the upstream Content-Length must
-        // not be forwarded or clients truncate/wait on the response
-        const body = inject(Buffer.concat(chunks).toString('utf8'));
-        const headers = { ...up.headers };
-        delete headers['transfer-encoding'];
-        headers['content-length'] = String(Buffer.byteLength(body));
-        headers['cache-control'] = 'no-store';
-        res.writeHead(up.statusCode, headers);
-        res.end(body);
-      });
-      return;
-    }
-    res.writeHead(up.statusCode, up.headers);
-    up.pipe(res);
+    const isHtml = (up.headers['content-type'] ?? '').startsWith('text/html');
+    const chunks = [];
+    up.on('data', (c) => chunks.push(c));
+    up.on('end', () => {
+      const raw = Buffer.concat(chunks);
+      // Injection lengthens the body, so the upstream Content-Length must be
+      // recomputed; non-HTML passes through as raw bytes (no text round-trip).
+      const out = isHtml ? Buffer.from(inject(raw.toString('utf8')), 'utf8') : raw;
+      res.writeHead(up.statusCode, proxyHeaders(up.headers, { html: isHtml, bodyLength: out.length }));
+      res.end(out);
+    });
   });
   upstream.on('error', (err) => {
     sendJson(res, 502, { error: { code: 'bad_gateway', message: `target unreachable: ${err.message}` } });

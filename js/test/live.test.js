@@ -135,15 +135,15 @@ test('live proxy forwards upstream response headers (duality with py server)', a
   const work = mkdtempSync(join(tmpdir(), 'tux-hdr-'));
   cleanups.push(() => rmSync(work, { recursive: true, force: true }));
 
+  const upstreamHtml = '<!doctype html><html><head><title>App</title></head><body><h1 id="h">App</h1></body></html>';
   const app = createServer((req, res) => {
     if (req.url === '/app.js') {
       const body = "console.log('app');";
       res.writeHead(200, { 'Content-Type': 'application/javascript; charset=utf-8', 'Content-Length': Buffer.byteLength(body) });
       res.end(body);
     } else {
-      const body = '<!doctype html><html><head><title>App</title></head><body><h1 id="h">App</h1></body></html>';
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': 'sid=abc123; Path=/', 'Content-Length': Buffer.byteLength(body) });
-      res.end(body);
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Set-Cookie': 'sid=abc123; Path=/', 'Content-Length': Buffer.byteLength(upstreamHtml) });
+      res.end(upstreamHtml);
     }
   });
   await new Promise((r) => app.listen(0, '127.0.0.1', r));
@@ -166,6 +166,7 @@ test('live proxy forwards upstream response headers (duality with py server)', a
   const jsBody = await jsRes.text();
   assert.ok(jsCtype && jsCtype.startsWith('application/javascript'), `Content-Type not forwarded: ${jsCtype}`);
   assert.equal(jsBody, "console.log('app');");
+  assert.equal(jsRes.headers.get('content-length'), String(Buffer.byteLength(jsBody)), 'Content-Length must match the sent body');
 
   // HTML page: upstream Set-Cookie must survive alongside injection
   const page = await fetch(`http://127.0.0.1:${port}/`);
@@ -173,4 +174,44 @@ test('live proxy forwards upstream response headers (duality with py server)', a
   const html = await page.text();
   assert.equal(cookie, 'sid=abc123; Path=/');
   assert.ok(html.includes('/__tux__/bootstrap.js'));
+  // injected page is strictly longer than upstream; Content-Length matches it exactly
+  assert.equal(page.headers.get('content-length'), String(Buffer.byteLength(html)));
+  assert.ok(Buffer.byteLength(html) > Buffer.byteLength(upstreamHtml));
+});
+
+test('live proxy forwards target 4xx as-is with client injection (duality with py server)', async () => {
+  const work = mkdtempSync(join(tmpdir(), 'tux-404-'));
+  cleanups.push(() => rmSync(work, { recursive: true, force: true }));
+
+  const pageHtml = '<!doctype html><html><head><title>Oops</title></head><body><h1 id="e">Missing</h1></body></html>';
+  const app = createServer((req, res) => {
+    const status = req.url.startsWith('/missing') ? 404 : 200;
+    res.writeHead(status, { 'Content-Type': 'text/html; charset=utf-8', 'Content-Length': Buffer.byteLength(pageHtml) });
+    res.end(pageHtml);
+  });
+  await new Promise((r) => app.listen(0, '127.0.0.1', r));
+  const appPort = app.address().port;
+  cleanups.push(() => app.close());
+
+  const port = 4192;
+  const cfg = { project_id: 'proxy-404-test', review: { enabled: true, store: '.tux/feedback.json', host: '127.0.0.1', port } };
+  const { writeFileSync } = await import('node:fs');
+  writeFileSync(join(work, 'tux.config.json'), JSON.stringify(cfg, null, 2) + '\n');
+
+  const started = tux(['live', 'start-review', '--url', `http://127.0.0.1:${appPort}`, '--port', String(port)], work);
+  assert.equal(started.status, 0, started.stderr);
+  cleanups.push(() => tux(['live', 'stop-review', '--format', 'json'], work));
+  await waitFor(`http://127.0.0.1:${port}/api/tux/health`);
+
+  // 200 page: injected as usual
+  const ok = await fetch(`http://127.0.0.1:${port}/`);
+  assert.equal(ok.status, 200);
+  assert.ok((await ok.text()).includes('/__tux__/bootstrap.js'));
+
+  // 404 page: forwarded as 404 (NOT 502) and still carries the client
+  const missing = await fetch(`http://127.0.0.1:${port}/missing-page`);
+  assert.equal(missing.status, 404);
+  const body = await missing.text();
+  assert.ok(body.includes('/__tux__/bootstrap.js'), '404 page still injects the client');
+  assert.equal(missing.headers.get('content-length'), String(Buffer.byteLength(body)), '404 Content-Length matches injected body');
 });

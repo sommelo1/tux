@@ -166,6 +166,8 @@ def test_proxy_forwards_target_errors_as_is(app_server, tmp_path: Path):
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/") as r:
             html = r.read().decode("utf-8")
         assert "/__tux__/bootstrap.js" in html
+        # Content-Length must match the body actually sent (keep-alive safety)
+        assert int(r.headers["Content-Length"]) == len(html.encode("utf-8"))
 
         # 404 page: forwarded as 404 (NOT 502) and still carries the client
         raised = False
@@ -176,6 +178,7 @@ def test_proxy_forwards_target_errors_as_is(app_server, tmp_path: Path):
             assert e.code == 404, f"expected passthrough 404, got {e.code}"
             html = e.read().decode("utf-8")
             assert "/__tux__/bootstrap.js" in html
+            assert int(e.headers["Content-Length"]) == len(html.encode("utf-8"))
         assert raised, "target 404 must pass through as HTTPError"
     finally:
         tux(["live", "stop-review"], work)
@@ -190,6 +193,7 @@ def test_proxy_forwards_upstream_headers(tmp_path: Path):
     HTML, Cache-Control (no-store) are rewritten."""
     work = tmp_path
     port = 4190
+    upstream_html = b'<!doctype html><html><head><title>App</title></head><body><h1 id="h">App</h1></body></html>'
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *a):
@@ -204,7 +208,7 @@ def test_proxy_forwards_upstream_headers(tmp_path: Path):
                 self.end_headers()
                 self.wfile.write(body)
             else:
-                body = b'<!doctype html><html><head><title>App</title></head><body><h1 id="h">App</h1></body></html>'
+                body = upstream_html
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Set-Cookie", "sid=abc123; Path=/")
@@ -230,16 +234,20 @@ def test_proxy_forwards_upstream_headers(tmp_path: Path):
         # Non-HTML asset: upstream Content-Type must be forwarded verbatim
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/app.js") as r:
             ctype = r.headers.get("Content-Type")
-            body = r.read().decode("utf-8")
+            body = r.read()
         assert ctype and ctype.startswith("application/javascript"), f"Content-Type not forwarded: {ctype!r}"
-        assert body == "console.log('app');", "asset body must pass through unmodified"
+        assert body == b"console.log('app');", "asset body must pass through unmodified"
+        assert int(r.headers["Content-Length"]) == len(body), "Content-Length must match the sent body"
 
         # HTML page: upstream Set-Cookie must survive alongside injection
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/") as r:
             cookie = r.headers.get("Set-Cookie")
-            html = r.read().decode("utf-8")
+            html = r.read()
         assert cookie == "sid=abc123; Path=/", f"Set-Cookie not forwarded: {cookie!r}"
-        assert "/__tux__/bootstrap.js" in html
+        assert b"/__tux__/bootstrap.js" in html
+        # injected page is strictly longer than upstream; Content-Length matches it exactly
+        assert int(r.headers["Content-Length"]) == len(html)
+        assert len(html) > len(upstream_html)
     finally:
         tux(["live", "stop-review"], work)
         srv.shutdown()
