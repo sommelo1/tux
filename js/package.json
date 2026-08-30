@@ -1,6 +1,6 @@
 {
   "name": "tux-review",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "TUX - TUX UIX review system: attach structured, machine-readable feedback directly to running web UIs (pages, routes, components, elements, states) with a deterministic CLI, canonical JSON and LLM-friendly skills.",
   "license": "MIT",
   "author": {
